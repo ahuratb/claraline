@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm *)",
+      "Bash(mkdir -p /tmp/claraline-stash)",
+      "Bash(mv CLAUDE.md claraline-master-prompt.md /tmp/claraline-stash/)",
+      "Read(//d/d/data/Claraline-pro/New folder/**)",
+      "Bash(cp /tmp/claraline-stash/CLAUDE.md \"/d/data/Claraline-pro/New folder/calraline/CLAUDE.md\")",
+      "Bash(cp /tmp/claraline-stash/claraline-master-prompt.md \"/d/data/Claraline-pro/New folder/calraline/claraline-master-prompt.md\")",
+      "PowerShell(Start-Process notepad \"D:\\\\data\\\\Claraline-pro\\\\New folder\\\\calraline\\\\.env.local\")",
+      "Bash(npm run *)",
+      "Bash(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
+      "Bash(Stop-Process -Force)",
+      "PowerShell(Get-Process *)",
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem src/components)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"D:\\\\data\\\\Claraline-pro\\\\New folder\\\\calraline\" -Recurse -Directory)",
+      "Bash(Select-Object -First 30 FullName)",
+      "Bash(npm list *)",
+      "Bash(npm install *)",
+      "Bash(not exist *)",
+      "PowerShell(New-Item *)",
+      "Bash(npx tsx -e ' *)",
+      "Bash(node -e ' *)",
+      "Bash(taskkill /PID 5484 /F)",
+      "Bash(Test-Path *)",
+      "Bash(git *)"
+    ]
+  }
+}
