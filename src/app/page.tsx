@@ -14,7 +14,7 @@ export default function HomePage() {
 
       {/* ══════════════════ VIDEO 1 — HERO ══════════════════ */}
       <VideoScroll
-        src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/1.mp4/"
+        src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/1.mp4"
         sectionHeight="500vh"
         overlays={[
           {
