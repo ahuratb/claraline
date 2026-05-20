@@ -14,7 +14,7 @@ export default function HomePage() {
 
       {/* ══════════════════ VIDEO 1 — HERO ══════════════════ */}
       <VideoScroll
-        src="/videos/1.mp4"
+        src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/1.mp4/"
         sectionHeight="500vh"
         overlays={[
           {
@@ -65,7 +65,7 @@ export default function HomePage() {
       <div className="video-row-pair">
         <div className="video-row-half">
           <VideoScroll
-            src="/videos/2.mp4"
+            src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/2.mp4"
             overlays={[
               {
                 id: 't2a',
@@ -89,7 +89,7 @@ export default function HomePage() {
         </div>
         <div className="video-row-half">
           <VideoScroll
-            src="/videos/5.mp4"
+            src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/5.mp4"
             overlays={[
               {
                 id: 't5a',
