@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Product } from '@/types'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
@@ -13,39 +13,64 @@ interface ProductCardProps {
   index?: number
 }
 
-const BADGE_STYLES: Record<string, string> = {
-  new: 'bg-[var(--rose)] text-white',
-  bestseller: 'bg-[var(--champagne)] text-[var(--obsidian)]',
-  limited: 'bg-[var(--deep)] text-[var(--champagne)] border border-[rgba(201,169,110,0.4)]',
+const COLLECTION_CRUMB: Record<string, { top: string; sub: string }> = {
+  lip:  { top: 'Lip Care', sub: 'Lip Color'   },
+  eye:  { top: 'Eye',      sub: 'Eye Makeup'  },
+  face: { top: 'Face',     sub: 'Complexion'  },
+  gift: { top: 'Gifts',    sub: 'Gift Sets'   },
+}
+
+// Subtle radial gradients to give each collection a different "shelf" tone
+// when there's no image (or behind a transparent product shot)
+const COLLECTION_BG: Record<string, string> = {
+  lip:  'radial-gradient(ellipse at 40% 35%, #2a1208 0%, #0a0806 72%)',
+  eye:  'radial-gradient(ellipse at 60% 40%, #1a1230 0%, #080810 72%)',
+  face: 'radial-gradient(ellipse at 50% 45%, #1a1008 0%, #080806 72%)',
+  gift: 'radial-gradient(ellipse at 50% 40%, #1a0a18 0%, #08060a 72%)',
+}
+
+const BADGE_CONFIG: Record<string, { label: string; bg: string; fg: string }> = {
+  new:        { label: 'New',         bg: '#C4827A',         fg: '#fff'          },
+  bestseller: { label: 'Best Seller', bg: 'var(--champagne)', fg: 'var(--obsidian)' },
+  limited:    { label: 'Limited',     bg: 'var(--deep)',       fg: 'var(--champagne)' },
 }
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem, openCart } = useCartStore()
   const cardRef = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  const [hovered, setHovered] = useState(false)
 
   useEffect(() => {
     const el = cardRef.current
     if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) el.classList.add('revealed') },
-      { threshold: 0.1 }
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect() } },
+      { threshold: 0.08 }
     )
-    observer.observe(el)
-    return () => observer.disconnect()
+    obs.observe(el)
+    return () => obs.disconnect()
   }, [])
 
   const imageUrl = product.images?.[0]
-    ? urlFor(product.images[0]).width(480).height(640).url()
+    ? urlFor(product.images[0]).width(640).height(854).url()
     : null
 
-  function handleAddToCart() {
+  const badge = product.badge ? BADGE_CONFIG[product.badge] : null
+  const crumb = COLLECTION_CRUMB[product.collection]
+  const bg    = COLLECTION_BG[product.collection] ?? COLLECTION_BG.lip
+  const delay = Math.min(index * 70, 600)
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
     addItem({
       productId: product._id,
-      name_en: product.name_en,
-      name_ar: product.name_ar,
-      price: product.price,
-      quantity: 1,
-      image: imageUrl ?? undefined,
+      name_en:   product.name_en,
+      name_ar:   product.name_ar,
+      price:     product.price,
+      quantity:  1,
+      image:     imageUrl ?? undefined,
     })
     toast.success(`${product.name_en} added ✦`)
     openCart()
@@ -54,59 +79,282 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   return (
     <div
       ref={cardRef}
-      className="reveal-target flex-shrink-0 w-[280px] group"
-      style={{ transitionDelay: `${index * 80}ms` }}
+      style={{
+        opacity:        visible ? 1 : 0,
+        transform:      visible ? 'translateY(0)' : 'translateY(40px)',
+        transition:     `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
+        maxWidth:       '320px',
+        width:          '100%',
+        margin:         '0 auto',
+        position:       'relative',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      {/* Image area */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-[var(--deep)]">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={product.name_en}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-            sizes="280px"
+      <Link href={`/product/${product.slug.current}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+
+        {/* ── Image area ─── 3/4 portrait, subtle dark gradient ─── */}
+        <div
+          style={{
+            position:  'relative',
+            aspectRatio: '3 / 4',
+            overflow:  'hidden',
+            background: 'var(--deep)',
+          }}
+        >
+          {/* Gradient backdrop — visible behind transparent product shots & as fallback */}
+          <div style={{ position: 'absolute', inset: 0, background: bg }} />
+
+          {/* Product image */}
+          {imageUrl ? (
+            <div
+              style={{
+                position:  'absolute',
+                inset:     0,
+                transform: hovered ? 'scale(1.06)' : 'scale(1)',
+                transition: 'transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94)',
+              }}
+            >
+              <Image
+                src={imageUrl}
+                alt={product.name_en}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          ) : (
+            <span
+              style={{
+                position:  'absolute',
+                top:       '50%',
+                left:      '50%',
+                transform: hovered ? 'translate(-50%, -55%)' : 'translate(-50%, -50%)',
+                transition: 'transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94)',
+                color:     'rgba(201,169,110,0.18)',
+                fontSize:  '42px',
+                lineHeight: 1,
+              }}
+            >
+              ✦
+            </span>
+          )}
+
+          {/* Subtle vignette top + bottom */}
+          <div
+            style={{
+              position: 'absolute',
+              inset:    0,
+              background: 'linear-gradient(to bottom, rgba(10,8,6,0.28) 0%, transparent 18%, transparent 65%, rgba(10,8,6,0.45) 100%)',
+              pointerEvents: 'none',
+            }}
           />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-[var(--champagne)] text-4xl opacity-20">✦</span>
+
+          {/* Badge */}
+          {badge && (
+            <span
+              style={{
+                position:    'absolute',
+                top:         '18px',
+                left:        '18px',
+                fontSize:    '8px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color:       badge.fg,
+                background:  badge.bg,
+                padding:     '5px 10px',
+                fontFamily:  'Cairo, sans-serif',
+                fontWeight:  600,
+                ...(product.badge === 'limited' ? { border: '0.5px solid rgba(201,169,110,0.4)' } : {}),
+              }}
+            >
+              {badge.label}
+            </span>
+          )}
+
+          {/* Shade count */}
+          {product.shades && product.shades.length > 1 && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '18px',
+                right: '18px',
+                fontSize: '8px',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--champagne)',
+                background: 'rgba(10,8,6,0.55)',
+                border: '0.5px solid rgba(201,169,110,0.25)',
+                padding: '4px 8px',
+                fontFamily: 'Cairo, sans-serif',
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
+              }}
+            >
+              {product.shades.length} Shades
+            </span>
+          )}
+
+          {/* Quick Add overlay — slides up on hover */}
+          <div
+            style={{
+              position:    'absolute',
+              bottom:      0,
+              left:        0,
+              right:       0,
+              padding:     '14px 20px',
+              background:  'rgba(10,8,6,0.92)',
+              borderTop:   '0.5px solid rgba(201,169,110,0.2)',
+              display:     'flex',
+              justifyContent: 'space-between',
+              alignItems:  'center',
+              transform:   hovered ? 'translateY(0)' : 'translateY(100%)',
+              transition:  'transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+          >
+            <span
+              role="button"
+              onClick={handleAddToCart}
+              style={{
+                fontSize:      '9px',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                color:         'var(--champagne)',
+                fontFamily:    'Cairo, sans-serif',
+                cursor:        'pointer',
+              }}
+            >
+              Quick Add
+            </span>
+            <span
+              onClick={handleAddToCart}
+              style={{
+                fontSize:   '20px',
+                fontWeight: 300,
+                color:      'var(--champagne)',
+                lineHeight: 1,
+                cursor:     'pointer',
+              }}
+            >
+              +
+            </span>
           </div>
-        )}
-
-        {/* Badge */}
-        {product.badge && (
-          <span
-            className={`absolute top-3 left-3 text-[8px] tracking-[0.25em] uppercase px-2 py-1 ${BADGE_STYLES[product.badge] ?? ''}`}
-            style={{ fontFamily: 'Cairo, sans-serif' }}
-          >
-            {product.badge === 'bestseller' ? 'Best Seller' : product.badge.charAt(0).toUpperCase() + product.badge.slice(1)}
-          </span>
-        )}
-
-        {/* Quick Add overlay */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 bg-[rgba(10,8,6,0.92)] border-t border-[rgba(201,169,110,0.2)]">
-          <button
-            onClick={handleAddToCart}
-            className="w-full py-3 text-[9px] tracking-[0.3em] uppercase text-[var(--champagne)] hover:text-[var(--ivory)] transition-colors"
-            style={{ fontFamily: 'Cairo, sans-serif' }}
-          >
-            Quick Add
-          </button>
         </div>
-      </div>
 
-      {/* Info */}
-      <div className="pt-4 space-y-1">
-        <Link href={`/product/${product.slug.current}`} className="no-underline">
-          <h3 className="text-[var(--ivory)] text-lg font-light leading-tight hover:text-[var(--champagne)] transition-colors" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+        {/* ── Info area ─────────────────────────────────────────── */}
+        <div style={{ padding: '20px 0 0' }}>
+
+          {/* Brand + breadcrumb row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
+            <span
+              style={{
+                fontSize:      '8px',
+                letterSpacing: '0.45em',
+                textTransform: 'uppercase',
+                color:         'var(--champagne)',
+                fontFamily:    'Cairo, sans-serif',
+                fontWeight:    500,
+              }}
+            >
+              Claraline
+            </span>
+            <span style={{ color: 'rgba(201,169,110,0.25)', fontSize: '10px', lineHeight: 1 }}>·</span>
+            {crumb && (
+              <span
+                style={{
+                  fontSize:      '8.5px',
+                  letterSpacing: '0.12em',
+                  color:         'var(--muted)',
+                  fontFamily:    'Cairo, sans-serif',
+                  display:       'inline-flex',
+                  alignItems:    'center',
+                  gap:           '5px',
+                }}
+              >
+                {crumb.top}
+                <span style={{ color: 'var(--champagne)', opacity: 0.45, fontSize: '10px', lineHeight: 1 }}>›</span>
+                {crumb.sub}
+              </span>
+            )}
+          </div>
+
+          {/* Product name */}
+          <h3
+            style={{
+              fontSize:     '20px',
+              fontWeight:   300,
+              letterSpacing: '0.03em',
+              marginBottom: '4px',
+              color:        hovered ? 'var(--champagne)' : 'var(--ivory)',
+              fontFamily:   "'Cormorant Garamond', serif",
+              transition:   'color 0.3s',
+              lineHeight:   1.2,
+            }}
+          >
             {product.name_en}
           </h3>
-        </Link>
-        <p className="text-[var(--muted)] text-[11px]" style={{ fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
-          {product.name_ar}
-        </p>
-        <p className="text-[var(--champagne)] text-sm tracking-wider pt-1">{formatPrice(product.price)}</p>
-      </div>
+
+          {/* Arabic name */}
+          <p
+            style={{
+              fontSize:    '11px',
+              color:       'var(--muted)',
+              fontFamily:  "'Amiri', 'Cairo', serif",
+              direction:   'rtl',
+              marginBottom: '12px',
+              lineHeight:   1.5,
+            }}
+          >
+            {product.name_ar}
+          </p>
+
+          {/* Price + shade swatches row */}
+          <div
+            style={{
+              display:        'flex',
+              justifyContent: 'space-between',
+              alignItems:     'center',
+              gap:            '12px',
+            }}
+          >
+            <p
+              style={{
+                fontSize:    '13px',
+                color:       'var(--champagne)',
+                letterSpacing: '0.1em',
+                fontFamily:  'Cairo, sans-serif',
+              }}
+            >
+              {formatPrice(product.price)}
+            </p>
+            {product.shades && product.shades.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {product.shades.slice(0, 4).map((s, i) => (
+                  <span
+                    key={i}
+                    title={s.name_en}
+                    style={{
+                      width:      '9px',
+                      height:     '9px',
+                      borderRadius: '50%',
+                      background: s.hex,
+                      boxShadow:  '0 0 0 0.5px rgba(201,169,110,0.4)',
+                      display:    'inline-block',
+                    }}
+                  />
+                ))}
+                {product.shades.length > 4 && (
+                  <span style={{ fontSize: '8.5px', color: 'var(--muted)', fontFamily: 'Cairo, sans-serif', marginLeft: '3px', letterSpacing: '0.05em' }}>
+                    +{product.shades.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </Link>
     </div>
   )
 }
