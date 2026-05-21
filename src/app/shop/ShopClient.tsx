@@ -606,9 +606,11 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <>
           <div
             onClick={() => setDrawerOpen(false)}
+            onTouchEnd={(e) => { e.preventDefault(); setDrawerOpen(false) }}
             style={{
               position: 'fixed', inset: 0, zIndex: 480,
               background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
+              cursor: 'pointer',
             }}
           />
           <div

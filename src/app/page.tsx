@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import VideoScroll from '@/components/VideoScroll'
 import { LipCarousel, EyeCarousel } from '@/components/CinematicCarousel'
 import RitualSection from '@/components/RitualSection'
@@ -10,7 +9,7 @@ export const revalidate = 3600
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="home-page">
 
       {/* ══════════════════ VIDEO 1 — HERO ══════════════════ */}
       <VideoScroll
@@ -300,7 +299,7 @@ export default function HomePage() {
           <div className="footer-grid">
             <div>
               <div className="footer-logo">
-                <Image src="/logo.png" alt="Claraline" width={160} height={48} style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
+                <span className="claraline-logo" style={{ width: '180px', height: '44px' }} aria-label="Claraline" />
               </div>
               <p className="footer-tag en-only" style={{ fontFamily: "'Cormorant Garamond', serif", direction: 'ltr' }}>Beauty from Kuwait to the world</p>
               <p className="footer-tag ar-only">جمالٌ من الكويت إلى العالم</p>

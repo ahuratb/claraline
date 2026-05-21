@@ -1,8 +1,9 @@
 'use client'
-import { useState } from 'react'
-import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store'
+
+type Theme = 'dark' | 'light'
 
 const NAV_LINKS = [
   { href: '/shop',    en: 'Collection',  ar: 'المجموعة'  },
@@ -14,14 +15,26 @@ const NAV_LINKS = [
 export default function MobileTopBar() {
   const [open, setOpen]   = useState(false)
   const [lang, setLang]   = useState<'EN' | 'AR'>('EN')
+  const [theme, setTheme] = useState<Theme>('dark')
   const { count, openCart } = useCartStore()
   const cartCount = count()
+
+  useEffect(() => {
+    setTheme(document.documentElement.classList.contains('theme-light') ? 'light' : 'dark')
+  }, [])
 
   const toggleLang = () => {
     const next = lang === 'EN' ? 'AR' : 'EN'
     setLang(next)
     document.documentElement.classList.toggle('lang-ar', next === 'AR')
     document.body.dir = next === 'AR' ? 'rtl' : 'ltr'
+  }
+
+  const toggleTheme = () => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    document.documentElement.classList.toggle('theme-light', next === 'light')
+    try { localStorage.setItem('claraline-theme', next) } catch {}
   }
 
   const close = () => setOpen(false)
@@ -41,15 +54,8 @@ export default function MobileTopBar() {
         </button>
 
         {/* Logo — centered */}
-        <Link href="/" className="mob-topbar-logo" onClick={close}>
-          <Image
-            src="/logo.png"
-            alt="Claraline"
-            width={120}
-            height={36}
-            style={{ height: '30px', width: 'auto', objectFit: 'contain' }}
-            priority
-          />
+        <Link href="/" className="mob-topbar-logo" onClick={close} aria-label="Claraline home">
+          <span className="claraline-logo" style={{ width: '120px', height: '30px' }} />
         </Link>
 
         {/* Cart */}
@@ -75,12 +81,10 @@ export default function MobileTopBar() {
 
         {/* Menu header */}
         <div className="mob-menu-head">
-          <Image
-            src="/logo.png"
-            alt="Claraline"
-            width={120}
-            height={36}
-            style={{ height: '28px', width: 'auto', objectFit: 'contain', opacity: 0.9 }}
+          <span
+            className="claraline-logo"
+            style={{ width: '120px', height: '28px', opacity: 0.9 }}
+            aria-label="Claraline"
           />
           <button className="mob-menu-close" onClick={close} aria-label="Close menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -109,7 +113,17 @@ export default function MobileTopBar() {
 
         <div className="mob-menu-divider" />
 
-        {/* Bottom: lang toggle */}
+        {/* Bottom: theme + lang toggles */}
+        <div className="mob-menu-foot">
+          <span className="mob-menu-foot-label en-only">Theme</span>
+          <span className="mob-menu-foot-label ar-only">السمة</span>
+          <button className="mob-lang-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+            <span className={theme === 'dark' ? 'active' : ''}>Dark</span>
+            <span className="mob-lang-sep">|</span>
+            <span className={theme === 'light' ? 'active' : ''}>Light</span>
+          </button>
+        </div>
+
         <div className="mob-menu-foot">
           <span className="mob-menu-foot-label en-only">Language</span>
           <span className="mob-menu-foot-label ar-only">اللغة</span>

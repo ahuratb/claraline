@@ -1,23 +1,24 @@
 'use client'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 const CATEGORIES = [
-  { id: 'lip-care',    nameEn: 'Lip Care',       nameAr: 'عناية بالشفاه',          image: '/lipcare.png' },
-  { id: 'lip-liner',   nameEn: 'Lip Liner',       nameAr: 'محدد الشفاه',            image: '/lipliner.png' },
-  { id: 'lip-multi',   nameEn: 'Lip Multi-Use',   nameAr: 'شفاه متعدد الاستخدام',  image: '/lipmultiuse.png' },
-  { id: 'primers',     nameEn: 'Primers',         nameAr: 'البرايمر',               image: '/primers.png' },
-  { id: 'highlighter', nameEn: 'Highlighter',     nameAr: 'الهايلايتر',             image: '/highlighter.png' },
-  { id: 'concealer',   nameEn: 'Concealer',       nameAr: 'الكونسيلر',              image: '/concealer.png' },
+  { id: 'lip-care',    nameEn: 'Lip Care',       nameAr: 'عناية بالشفاه',         image: '/lipcare.png' },
+  { id: 'lip-liner',   nameEn: 'Lip Liner',       nameAr: 'محدد الشفاه',           image: '/lipliner.png' },
+  { id: 'lip-multi',   nameEn: 'Lip Multi-Use',   nameAr: 'شفاه متعدد الاستخدام', image: '/lipmultiuse.png' },
+  { id: 'primers',     nameEn: 'Primers',         nameAr: 'البرايمر',              image: '/primers.png' },
+  { id: 'highlighter', nameEn: 'Highlighter',     nameAr: 'الهايلايتر',            image: '/highlighter.png' },
+  { id: 'concealer',   nameEn: 'Concealer',       nameAr: 'الكونسيلر',             image: '/concealer.png' },
 ]
 
-function CatCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number }) {
-  const [imgSrc, setImgSrc] = useState<string | null>(null)
-  const [imgError, setImgError] = useState(false)
+function CircleItem({ cat, index }: { cat: typeof CATEGORIES[0]; index: number }) {
+  const [imgSrc, setImgSrc]       = useState<string | null>(null)
+  const [imgError, setImgError]   = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const justDropped = useRef(false)
-  const storageKey = `claraline-cat-img-${cat.id}`
+  const fileInputRef              = useRef<HTMLInputElement>(null)
+  const justDropped               = useRef(false)
+  const storageKey                = `claraline-cat-img-${cat.id}`
 
   useEffect(() => {
     const stored = localStorage.getItem(storageKey)
@@ -62,54 +63,36 @@ function CatCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number }) {
   const activeSrc = imgSrc ?? (!imgError ? cat.image : null)
 
   return (
-    <a
+    <Link
       href={`/shop?category=${cat.id}`}
-      className={`cat-card reveal-target${isDragOver ? ' cat-drag-over' : ''}`}
-      style={{ transitionDelay: `${index * 0.08}s`, textDecoration: 'none' }}
+      className="cat-circle reveal-target"
+      style={{ transitionDelay: `${index * 0.06}s` }}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       onClick={(e) => { if (justDropped.current) e.preventDefault() }}
+      draggable={false}
     >
-      <div className="cat-img-wrap">
+      <div className="cat-circle-img">
         {activeSrc && (
           <Image
             src={activeSrc}
             alt={cat.nameEn}
             fill
-            sizes="(max-width: 768px) 50vw, 33vw"
+            sizes="(max-width: 768px) 130px, 180px"
             style={{ objectFit: 'cover' }}
             onError={() => { if (!imgSrc) setImgError(true) }}
+            draggable={false}
           />
         )}
-
-        {/* Drag-to-replace overlay for cards that already have an image */}
-        {!showUploadZone && isDragOver && (
-          <div className="cat-replace-hint">
-            <span className="cat-replace-icon">↓</span>
-            <span className="en-only">Replace image</span>
-            <span className="ar-only">استبدل الصورة</span>
-          </div>
-        )}
-
-        {/* Upload prompt for cards with missing images */}
         {showUploadZone && (
           <div
-            className={`cat-upload-zone${isDragOver ? ' dragging' : ''}`}
+            className={`cat-circle-upload${isDragOver ? ' dragging' : ''}`}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click() }}
           >
-            <div className="cat-upload-icon">✦</div>
-            <div className="cat-upload-text">
-              <span className="en-only">Drop image here</span>
-              <span className="ar-only">أسقط الصورة هنا</span>
-            </div>
-            <div className="cat-upload-sub">
-              <span className="en-only">or click to upload</span>
-              <span className="ar-only">أو اضغط للرفع</span>
-            </div>
+            ✦
           </div>
         )}
-
         <input
           ref={fileInputRef}
           type="file"
@@ -117,14 +100,68 @@ function CatCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number }) {
           style={{ display: 'none' }}
           onChange={onFileChange}
         />
-
-        <div className="cat-overlay" />
-        <div className="cat-name-overlay">
-          <span className="en-only">{cat.nameEn}</span>
-          <span className="ar-only">{cat.nameAr}</span>
-        </div>
       </div>
-    </a>
+      <div className="cat-circle-name">
+        <span className="en-only">{cat.nameEn}</span>
+        <span className="ar-only">{cat.nameAr}</span>
+      </div>
+    </Link>
+  )
+}
+
+function CircleCarousel() {
+  const wrapRef       = useRef<HTMLDivElement>(null)
+  const isDownRef     = useRef(false)
+  const startXRef     = useRef(0)
+  const startScrollRef = useRef(0)
+  const didDragRef    = useRef(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!wrapRef.current) return
+    // Only drag with mouse — let native touch scroll handle finger swipes
+    if (e.pointerType !== 'mouse') return
+    isDownRef.current = true
+    didDragRef.current = false
+    startXRef.current = e.clientX
+    startScrollRef.current = wrapRef.current.scrollLeft
+    setIsDragging(true)
+  }
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDownRef.current || !wrapRef.current) return
+    const dx = e.clientX - startXRef.current
+    if (Math.abs(dx) > 5) didDragRef.current = true
+    wrapRef.current.scrollLeft = startScrollRef.current - dx
+  }
+  const stopDrag = () => {
+    isDownRef.current = false
+    setIsDragging(false)
+  }
+
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (didDragRef.current) {
+      // Block the click that would otherwise follow a drag
+      e.preventDefault()
+      e.stopPropagation()
+      didDragRef.current = false
+    }
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`cat-circle-track${isDragging ? ' dragging' : ''}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={stopDrag}
+      onPointerLeave={stopDrag}
+      onPointerCancel={stopDrag}
+      onClickCapture={onClickCapture}
+    >
+      {CATEGORIES.map((cat, i) => (
+        <CircleItem key={cat.id} cat={cat} index={i} />
+      ))}
+    </div>
   )
 }
 
@@ -138,11 +175,7 @@ export default function CategoryGrid() {
         <h2 className="section-title en-only">Find your <em>ritual</em></h2>
         <h2 className="section-title ar-only">اعثري على <em>طقسكِ</em></h2>
       </div>
-      <div className="cat-grid">
-        {CATEGORIES.map((cat, i) => (
-          <CatCard key={cat.id} cat={cat} index={i} />
-        ))}
-      </div>
+      <CircleCarousel />
       <div className="sep" />
     </div>
   )

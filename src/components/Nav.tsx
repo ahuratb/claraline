@@ -1,19 +1,26 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useCartStore } from '@/lib/store'
+
+type Theme = 'dark' | 'light'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [lang, setLang] = useState<'EN' | 'AR'>('EN')
-  const { count, openCart } = useCartStore()
+  const [theme, setTheme] = useState<Theme>('dark')
+  const { count, isOpen, openCart, closeCart } = useCartStore()
   const cartCount = count()
+  const toggleCart = () => (isOpen ? closeCart() : openCart())
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    setTheme(document.documentElement.classList.contains('theme-light') ? 'light' : 'dark')
   }, [])
 
   const toggleLang = () => {
@@ -23,34 +30,43 @@ export default function Nav() {
     document.body.dir = next === 'AR' ? 'rtl' : 'ltr'
   }
 
+  const toggleTheme = () => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    document.documentElement.classList.toggle('theme-light', next === 'light')
+    try { localStorage.setItem('claraline-theme', next) } catch {}
+  }
+
   return (
     <nav
-      className={`main-nav fixed top-0 left-0 right-0 z-[200] flex justify-between items-center px-14 transition-all duration-500 ${
+      className={`main-nav fixed top-0 left-0 right-0 z-[200] flex justify-between items-center px-16 transition-all duration-500 ${
         scrolled
-          ? 'py-4 bg-black/80 backdrop-blur-md border-b border-[rgba(201,169,110,0.12)]'
-          : 'py-6 bg-transparent'
+          ? 'py-5 backdrop-blur-md border-b border-[rgba(201,169,110,0.12)]'
+          : 'py-7'
       }`}
-      style={{ fontFamily: 'Cairo, sans-serif' }}
+      style={{
+        fontFamily: 'Cairo, sans-serif',
+        background: scrolled
+          ? 'color-mix(in srgb, var(--obsidian) 80%, transparent)'
+          : 'transparent',
+      }}
     >
       {/* Logo */}
       <Link
         href="/"
         className="no-underline flex items-center"
         style={{ animation: 'fadeUp 1s 0.3s forwards', opacity: 0 }}
+        aria-label="Claraline home"
       >
-        <Image
-          src="/logo.png"
-          alt="Claraline"
-          width={140}
-          height={40}
-          style={{ height: '36px', width: 'auto', objectFit: 'contain' }}
-          priority
+        <span
+          className="claraline-logo"
+          style={{ width: '180px', height: '44px' }}
         />
       </Link>
 
       {/* Links */}
       <ul
-        className="flex gap-8 list-none"
+        className="flex gap-10 list-none"
         style={{ animation: 'fadeUp 1s 0.5s forwards', opacity: 0 }}
       >
         {[
@@ -61,7 +77,7 @@ export default function Nav() {
           <li key={label}>
             <Link
               href={href}
-              className="text-[9px] tracking-[0.3em] uppercase text-[var(--ivory)] opacity-60 hover:opacity-100 hover:text-[var(--champagne)] transition-all duration-300 no-underline"
+              className="text-[11px] tracking-[0.32em] uppercase text-[var(--ivory)] opacity-70 hover:opacity-100 hover:text-[var(--champagne)] transition-all duration-300 no-underline"
             >
               {label}
             </Link>
@@ -69,32 +85,51 @@ export default function Nav() {
         ))}
       </ul>
 
-      {/* Right: lang toggle + cart */}
+      {/* Right: theme + lang + cart */}
       <div
         className="flex items-center gap-5"
         style={{ animation: 'fadeUp 1s 0.6s forwards', opacity: 0 }}
       >
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="w-[40px] h-[40px] border border-[rgba(201,169,110,0.3)] flex items-center justify-center hover:border-[var(--champagne)] hover:bg-[rgba(201,169,110,0.08)] transition-all duration-300"
+          style={{ color: 'var(--champagne)' }}
+        >
+          {theme === 'dark' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          )}
+        </button>
+
         {/* Lang toggle */}
         <button
           onClick={toggleLang}
-          className="text-[9px] tracking-[0.25em] uppercase text-[var(--champagne)] opacity-70 hover:opacity-100 transition-opacity"
+          className="text-[11px] tracking-[0.25em] uppercase text-[var(--champagne)] opacity-80 hover:opacity-100 transition-opacity px-1"
         >
           {lang === 'EN' ? 'عربي' : 'EN'}
         </button>
 
         {/* Cart */}
         <button
-          onClick={openCart}
-          className="relative w-[38px] h-[38px] border border-[rgba(201,169,110,0.3)] flex items-center justify-center hover:border-[var(--champagne)] hover:bg-[rgba(201,169,110,0.08)] transition-all duration-300"
-          aria-label="Open cart"
+          onClick={toggleCart}
+          className="relative w-[44px] h-[44px] border border-[rgba(201,169,110,0.3)] flex items-center justify-center hover:border-[var(--champagne)] hover:bg-[rgba(201,169,110,0.08)] transition-all duration-300"
+          aria-label="Toggle cart"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" strokeWidth="1.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--champagne)" strokeWidth="1.5">
             <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
             <path d="M16 10a4 4 0 01-8 0"/>
           </svg>
           {cartCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[var(--champagne)] rounded-full text-[8px] text-[var(--obsidian)] flex items-center justify-center font-semibold">
+            <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] bg-[var(--champagne)] rounded-full text-[9px] text-[var(--obsidian)] flex items-center justify-center font-semibold">
               {cartCount}
             </span>
           )}

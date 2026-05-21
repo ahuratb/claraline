@@ -22,10 +22,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Restore saved theme before first paint — prevents flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('claraline-theme');if(t==='light')document.documentElement.classList.add('theme-light');}catch(e){}})();`
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        {/* Satoshi (Fontshare) — English; Noto Sans Arabic (Google) — Arabic */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -44,10 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position="bottom-right"
           toastOptions={{
             style: {
-              background: '#1a1208',
-              color: '#FAF5EE',
+              background: 'var(--deep)',
+              color: 'var(--ivory)',
               border: '0.5px solid rgba(201,169,110,0.4)',
-              fontFamily: 'Cairo, sans-serif',
+              fontFamily: 'Satoshi, sans-serif',
               fontSize: '12px',
               letterSpacing: '0.05em',
             },

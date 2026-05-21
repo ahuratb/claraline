@@ -44,11 +44,18 @@ const TABS = [
 
 export default function BottomNav() {
   const pathname  = usePathname()
-  const { count, openCart } = useCartStore()
+  const { count, isOpen, openCart, closeCart } = useCartStore()
   const cartCount = count()
+  const toggleCart = () => (isOpen ? closeCart() : openCart())
 
   return (
-    <nav className="bottom-nav" aria-label="Mobile navigation">
+    <nav
+      className="bottom-nav"
+      aria-label="Mobile navigation"
+      // When the cart is open, lift the bottom-nav ABOVE the drawer (401) so
+      // the bag icon stays tappable and toggleCart can close it.
+      style={isOpen ? { zIndex: 402 } : undefined}
+    >
       <div className="bottom-nav-inner">
         {TABS.map((tab, i) => {
           const isActive = tab.href === '/' ? pathname === '/' : tab.href ? pathname.startsWith(tab.href.split('#')[0]) : false
@@ -57,9 +64,9 @@ export default function BottomNav() {
             return (
               <button
                 key={i}
-                onClick={openCart}
+                onClick={toggleCart}
                 className="bottom-nav-tab"
-                aria-label="Open cart"
+                aria-label="Toggle cart"
               >
                 {cartCount > 0 && (
                   <span className="bottom-nav-badge">{cartCount}</span>
