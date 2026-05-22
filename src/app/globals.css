@@ -331,7 +331,7 @@ video.hero-vid {
 .revealed .sc-title { opacity: 1; transform: translateY(0); }
 .revealed .feature-card { opacity: 1; transform: translateY(0); }
 .revealed .test-card { opacity: 1; transform: translateY(0); }
-.revealed.stat-item { opacity: 1; transform: translateY(0); }
+.revealed .stat-item { opacity: 1; transform: translateY(0); }
 
 /* MARQUEE */
 .marquee { padding: 22px 0 14px; overflow: hidden; white-space: nowrap; border-top: 0.5px solid rgba(201,169,110,0.08); border-bottom: 0.5px solid rgba(201,169,110,0.08); }
