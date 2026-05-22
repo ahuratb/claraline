@@ -78,6 +78,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   return (
     <div
       ref={cardRef}
+      className="pc-root"
       style={{
         opacity:        visible ? 1 : 0,
         transform:      visible ? 'translateY(0)' : 'translateY(40px)',
@@ -283,6 +284,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           {/* Product name */}
           <h3
+            className="pc-name"
             style={{
               fontSize:     '20px',
               fontWeight:   300,
@@ -299,6 +301,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           {/* Arabic name */}
           <p
+            className="pc-name-ar"
             style={{
               fontSize:    '11px',
               color:       'var(--muted)',
@@ -321,6 +324,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             }}
           >
             <p
+              className="pc-price"
               style={{
                 fontSize:    '13px',
                 color:       'var(--champagne)',

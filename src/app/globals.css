@@ -1313,6 +1313,169 @@ html.lang-ar .ls-image { right: auto; left: 0; }
 }
 
 /* ═══════════════════════════════════════════════════
+   MEGA MENU SECTION HEADER (mobile drawer)
+═══════════════════════════════════════════════════ */
+.megamenu-section-head {
+  padding: 20px 24px 10px;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--champagne);
+  opacity: 0.75;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.megamenu-section-head-ar {
+  color: var(--muted);
+  opacity: 0.6;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.megamenu-cats { padding-left: 16px; }
+.megamenu-cats .megamenu-cat-head { padding-left: 8px; }
+
+/* ═══════════════════════════════════════════════════
+   MEGA MENU PANEL (desktop / tablet)
+═══════════════════════════════════════════════════ */
+.megamenu-panel {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--obsidian) 92%, transparent);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-bottom: 0.5px solid rgba(201,169,110,0.15);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  padding: 48px 80px;
+  max-height: 70vh;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.megamenu-panel.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.megamenu-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,169,110,0.06) 0%, transparent 60%);
+}
+.megamenu-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.megamenu-col {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 8px;
+  transition: background 0.3s;
+}
+.megamenu-col-icon {
+  color: var(--champagne);
+  margin-bottom: 18px;
+  transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.megamenu-col:hover .megamenu-col-icon { transform: scale(1.05); }
+.megamenu-col-title {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--ivory);
+  line-height: 1.1;
+}
+.megamenu-col-title-sub {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+.megamenu-col-divider {
+  height: 0.5px;
+  background: rgba(201,169,110,0.2);
+  margin: 18px 0 16px;
+}
+.megamenu-col-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.megamenu-col-link {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--ivory);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  transition: color 0.2s, transform 0.2s;
+}
+.megamenu-col-link:hover {
+  color: var(--champagne);
+  transform: translateX(4px);
+}
+html.lang-ar .megamenu-col-link:hover { transform: translateX(-4px); }
+.megamenu-col-viewall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--champagne);
+  text-decoration: none;
+  transition: gap 0.25s;
+}
+.megamenu-col-viewall:hover { gap: 14px; }
+
+@media (max-width: 1023px) {
+  .megamenu-panel { padding: 36px 32px; }
+  .megamenu-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .megamenu-col-icon svg { width: 48px; height: 48px; }
+  .megamenu-col-title { font-size: 22px; }
+}
+
+@media (max-width: 767px) {
+  .megamenu-panel { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE PRODUCT CARDS — scaled for 2-col grid
+═══════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* Home page carousel — show 2 cards per row instead of one */
+  .carousel-track-wrap { padding: 0 16px; }
+  .p-card { flex: 0 0 calc((100vw - 16px - 16px - 14px) / 2); }
+  .carousel-track { gap: 14px; }
+
+  /* Scale typography down for narrower cards (CinematicCarousel) */
+  .p-card .p-name { font-size: 14px; letter-spacing: 0.02em; }
+  .p-card .p-name-ar { font-size: 10px; }
+  .p-card .p-price { font-size: 12px; }
+  .p-badge { font-size: 7px; padding: 3px 7px; letter-spacing: 0.15em; }
+  .p-quick-add { font-size: 8px; padding: 10px 14px; letter-spacing: 0.15em; }
+  .p-info { padding-top: 12px; }
+  .p-card-img { border-radius: 12px; }
+
+  /* Shop grid ProductCard inline styles need !important to override */
+  .pc-root .pc-name    { font-size: 14px !important; letter-spacing: 0.02em !important; line-height: 1.25 !important; }
+  .pc-root .pc-name-ar { font-size: 10px !important; margin-bottom: 8px !important; }
+  .pc-root .pc-price   { font-size: 12px !important; letter-spacing: 0.05em !important; }
+}
+
+/* ═══════════════════════════════════════════════════
    TABLET  (769px – 1024px)
 ═══════════════════════════════════════════════════ */
 @media (min-width: 769px) and (max-width: 1024px) {

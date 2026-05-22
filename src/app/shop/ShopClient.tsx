@@ -651,8 +651,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
           section { padding-left: 32px !important; padding-right: 32px !important; }
         }
         @media (max-width: 640px) {
-          .shop-grid { grid-template-columns: 1fr; gap: 28px; }
-          section { padding-left: 20px !important; padding-right: 20px !important; }
+          .shop-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+          section { padding-left: 16px !important; padding-right: 16px !important; }
         }
       `}</style>
     </div>
