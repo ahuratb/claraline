@@ -2141,3 +2141,233 @@ html.lang-ar .pdp-acc-title-ar { margin-left: 0; margin-right: 10px; }
   .pdp-moment-ar { font-size: 16px; }
   .pdp-sticky-buy { display: block; }
 }
+
+/* ═══════════════════════════════════════════════════
+   HERO CTA WRAP (VideoScroll overlay)
+═══════════════════════════════════════════════════ */
+.hero-cta-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+@media (max-width: 768px) {
+  .hero-cta-wrap { margin-top: 32px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   LANGUAGE PILL (mobile + desktop)
+═══════════════════════════════════════════════════ */
+.mob-lang-pill,
+.nav-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0.5px solid rgba(201,169,110,0.3);
+  color: var(--champagne);
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  padding: 0 10px;
+  height: 28px;
+  min-width: 36px;
+  border-radius: 2px;
+  transition: border-color 0.25s, background 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-lang-pill:hover,
+.nav-lang-pill:hover {
+  border-color: var(--champagne);
+  background: rgba(201,169,110,0.06);
+}
+.nav-lang-pill {
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  height: 32px;
+  padding: 0 12px;
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE TOP BAR — actions cluster
+═══════════════════════════════════════════════════ */
+.mob-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { background: rgba(201,169,110,0.08); }
+@media (min-width: 769px) {
+  .mob-topbar-actions { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   WHATSAPP FLOATING ACTION BUTTON
+═══════════════════════════════════════════════════ */
+.wa-fab {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 90;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 4px rgba(201,169,110,0.15), 0 14px 32px -10px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.wa-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 8px rgba(201,169,110,0.18), 0 18px 40px -10px rgba(0,0,0,0.6);
+}
+.wa-fab-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #25D366;
+  opacity: 0.5;
+  animation: waPulse 4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes waPulse {
+  0%   { transform: scale(1);   opacity: 0.45; }
+  60%  { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.wa-fab-tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background: var(--obsidian);
+  color: var(--ivory);
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 8px 14px;
+  border: 0.5px solid rgba(201,169,110,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.wa-fab:hover .wa-fab-tooltip { opacity: 1; }
+@media (max-width: 768px) {
+  .wa-fab {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  .wa-fab svg { width: 22px; height: 22px; }
+  .wa-fab-tooltip { display: none; }
+}
+/* Hide when any drawer is open so the FAB doesn't sit on top of backdrops */
+body:has(.drawer-panel[aria-hidden="false"]) .wa-fab { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+
+/* ═══════════════════════════════════════════════════
+   LOADING SCREEN
+═══════════════════════════════════════════════════ */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0806;
+  color: #FAF5EE;
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.loading-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(201,169,110,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.loading-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.55;
+  pointer-events: none;
+}
+.loading-screen.done { opacity: 0; pointer-events: none; }
+.loading-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.loading-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #C9A96E;
+}
+.loading-star {
+  font-size: 14px;
+  animation: loadingStarPulse 2s ease-in-out infinite;
+  opacity: 0.7;
+}
+@keyframes loadingStarPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+.loading-logo-text {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  color: #C9A96E;
+  line-height: 1;
+}
+.loading-tagline {
+  margin-top: 14px;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: rgba(154,138,122,0.85);
+}
+.loading-bar {
+  width: 280px;
+  height: 1px;
+  background: rgba(201,169,110,0.15);
+  margin-top: 60px;
+  overflow: hidden;
+}
+.loading-bar-fill {
+  height: 100%;
+  background: #C9A96E;
+  transition: width 0.2s linear;
+}
+.loading-pct {
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #C9A96E;
+}
+@media (max-width: 640px) {
+  .loading-logo-text { font-size: 36px; letter-spacing: 0.3em; }
+  .loading-bar { width: 220px; }
+}

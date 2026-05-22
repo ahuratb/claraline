@@ -6,6 +6,8 @@ import RevealObserver from '@/components/RevealObserver'
 import BottomNav from '@/components/BottomNav'
 import MobileTopBar from '@/components/MobileTopBar'
 import Cursor from '@/components/Cursor'
+import LoadingScreen from '@/components/LoadingScreen'
+import WhatsAppButton from '@/components/WhatsAppButton'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning>
+        <LoadingScreen />
         <Cursor />
 
         <RevealObserver />
@@ -56,6 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartDrawer />
         <BottomNav />
         {children}
+
+        <WhatsAppButton />
 
         <Toaster
           position="bottom-right"

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store'
 import MegaMenu from '@/components/MegaMenu'
+import KuwaitFlag from '@/components/KuwaitFlag'
 
 type Theme = 'dark' | 'light'
 
@@ -154,9 +155,11 @@ export default function Nav() {
 
           <button
             onClick={toggleLang}
-            className="text-[11px] tracking-[0.25em] uppercase text-[var(--champagne)] opacity-80 hover:opacity-100 transition-opacity px-1"
+            className="nav-lang-pill"
+            aria-label={lang === 'EN' ? 'Switch to Arabic' : 'Switch to English'}
           >
-            {lang === 'EN' ? 'عربي' : 'EN'}
+            {lang === 'EN' && <KuwaitFlag width={20} height={14} />}
+            <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
 
           <button

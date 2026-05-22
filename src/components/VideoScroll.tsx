@@ -130,36 +130,40 @@ export default function VideoScroll({ src, overlays, sectionHeight = '400vh', ma
                   <p className={`subline${hasBothSublines ? ' ar-only' : ''}`}>{o.sublineAr}</p>
                 )}
 
-                {/* CTA */}
-                {o.cta && (o.cta.scrollTo ? (
-                  <>
-                    <button
-                      className={`cta-btn${o.cta.labelAr ? ' en-only' : ''}`}
-                      onClick={() => document.getElementById(o.cta!.scrollTo!)?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                      {o.cta.label}
-                    </button>
-                    {o.cta.labelAr && (
-                      <button
-                        className="cta-btn ar-only"
-                        onClick={() => document.getElementById(o.cta!.scrollTo!)?.scrollIntoView({ behavior: 'smooth' })}
-                      >
-                        {o.cta.labelAr}
-                      </button>
+                {/* CTA — wrapped so it sits centered below the text block */}
+                {o.cta && (
+                  <div className="hero-cta-wrap">
+                    {o.cta.scrollTo ? (
+                      <>
+                        <button
+                          className={`cta-btn${o.cta.labelAr ? ' en-only' : ''}`}
+                          onClick={() => document.getElementById(o.cta!.scrollTo!)?.scrollIntoView({ behavior: 'smooth' })}
+                        >
+                          {o.cta.label}
+                        </button>
+                        {o.cta.labelAr && (
+                          <button
+                            className="cta-btn ar-only"
+                            onClick={() => document.getElementById(o.cta!.scrollTo!)?.scrollIntoView({ behavior: 'smooth' })}
+                          >
+                            {o.cta.labelAr}
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <Link href={o.cta.href!} className={`cta-btn${o.cta.labelAr ? ' en-only' : ''}`}>
+                          {o.cta.label}
+                        </Link>
+                        {o.cta.labelAr && (
+                          <Link href={o.cta.href!} className="cta-btn ar-only">
+                            {o.cta.labelAr}
+                          </Link>
+                        )}
+                      </>
                     )}
-                  </>
-                ) : (
-                  <>
-                    <Link href={o.cta.href!} className={`cta-btn${o.cta.labelAr ? ' en-only' : ''}`}>
-                      {o.cta.label}
-                    </Link>
-                    {o.cta.labelAr && (
-                      <Link href={o.cta.href!} className="cta-btn ar-only">
-                        {o.cta.labelAr}
-                      </Link>
-                    )}
-                  </>
-                ))}
+                  </div>
+                )}
 
               </div>
             )

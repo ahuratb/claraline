@@ -67,6 +67,7 @@ MYFATOORAH_BASE_URL=https://apitest.myfatoorah.com
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=orders@claraline.com
+NEXT_PUBLIC_WHATSAPP_NUMBER=96500000000
 ```
 Switch `MYFATOORAH_BASE_URL` to `https://api.myfatoorah.com` for production.
 
