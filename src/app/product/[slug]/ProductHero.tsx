@@ -211,7 +211,7 @@ export default function ProductHero({ product, ingredientCopy, howToUseEn, howTo
           <div className="pdp-trust">
             <span className="pdp-trust-item">
               <span className="pdp-trust-mark">✦</span>
-              <span className="en-only">Free delivery KD 20+</span>
+              <span className="en-only">Free delivery KWD 20+</span>
               <span className="ar-only" dir="rtl">توصيل مجاني فوق ٢٠ د.ك</span>
             </span>
             <span className="pdp-trust-item">

@@ -8,7 +8,7 @@ export async function sendOrderConfirmation(order: Order) {
     `<tr>
       <td style="padding:8px;border-bottom:1px solid #2a1a0a">${i.name_en}</td>
       <td style="padding:8px;border-bottom:1px solid #2a1a0a;text-align:center">${i.quantity}</td>
-      <td style="padding:8px;border-bottom:1px solid #2a1a0a;text-align:right">KD ${(i.price * i.quantity).toFixed(3)}</td>
+      <td style="padding:8px;border-bottom:1px solid #2a1a0a;text-align:right">KWD ${(i.price * i.quantity).toFixed(3)}</td>
     </tr>`
   ).join('')
 
@@ -31,7 +31,7 @@ export async function sendOrderConfirmation(order: Order) {
           <tbody>${itemsHtml}</tbody>
         </table>
         <div style="text-align:right;font-size:18px;color:#C9A96E;margin-bottom:40px">
-          Total: KD ${order.total.toFixed(3)}
+          Total: KWD ${order.total.toFixed(3)}
         </div>
         <p style="color:#9a8a7a;font-size:12px;text-align:center">Questions? WhatsApp us · claraline.com</p>
       </div>

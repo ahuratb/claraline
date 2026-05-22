@@ -20,13 +20,12 @@ const COLLECTION_CRUMB: Record<string, { top: string; sub: string }> = {
   gift: { top: 'Gifts',    sub: 'Gift Sets'   },
 }
 
-// Subtle radial gradients to give each collection a different "shelf" tone
-// when there's no image (or behind a transparent product shot)
+// Subtle grey radial gradients — neutral shelf tone behind product shots
 const COLLECTION_BG: Record<string, string> = {
-  lip:  'radial-gradient(ellipse at 40% 35%, #2a1208 0%, #0a0806 72%)',
-  eye:  'radial-gradient(ellipse at 60% 40%, #1a1230 0%, #080810 72%)',
-  face: 'radial-gradient(ellipse at 50% 45%, #1a1008 0%, #080806 72%)',
-  gift: 'radial-gradient(ellipse at 50% 40%, #1a0a18 0%, #08060a 72%)',
+  lip:  'radial-gradient(ellipse at 40% 35%, #3a3735 0%, #1e1c1b 75%)',
+  eye:  'radial-gradient(ellipse at 60% 40%, #353638 0%, #1c1d1e 75%)',
+  face: 'radial-gradient(ellipse at 50% 45%, #38383a 0%, #1d1d1f 75%)',
+  gift: 'radial-gradient(ellipse at 50% 40%, #3a3736 0%, #1e1c1c 75%)',
 }
 
 const BADGE_CONFIG: Record<string, { label: string; bg: string; fg: string }> = {
@@ -93,13 +92,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       <Link href={`/product/${product.slug.current}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
 
-        {/* ── Image area ─── 3/4 portrait, subtle dark gradient ─── */}
+        {/* ── Image area ─── 3/4 portrait, soft grey shelf, rounded ─── */}
         <div
           style={{
-            position:  'relative',
+            position:    'relative',
             aspectRatio: '3 / 4',
-            overflow:  'hidden',
-            background: 'var(--deep)',
+            overflow:    'hidden',
+            background:  '#2a2a2e',
+            borderRadius: '16px',
+            border:       '0.5px solid rgba(255,255,255,0.04)',
           }}
         >
           {/* Gradient backdrop — visible behind transparent product shots & as fallback */}

@@ -136,12 +136,12 @@ function SaffronGlowSvg() {
 }
 
 const LIP_CARDS = [
-  { name: 'Velvet Rouge',  nameAr: 'أحمر شفاه مخملي',          price: 'KD 18.500', stars: '★★★★★', badge: 'Best Seller', badgeNew: false, bg: 'c1', Svg: VelvetRougeSvg },
-  { name: 'Desert Dusk',   nameAr: 'باليت غروب الصحراء',       price: 'KD 34.000', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c2', Svg: DesertDuskSvg },
-  { name: 'Golden Hour',   nameAr: 'كونسيلر الساعة الذهبية',   price: 'KD 22.000', stars: '★★★★☆', badge: '',            badgeNew: false, bg: 'c3', Svg: GoldenHourSvg },
-  { name: 'Midnight Kohl', nameAr: 'كحل منتصف الليل',          price: 'KD 16.000', stars: '★★★★★', badge: 'Limited',     badgeNew: false, bg: 'c4', Svg: MidnightKohlSvg },
-  { name: 'Rose Ritual',   nameAr: 'بلاش وردي',                price: 'KD 26.000', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c5', Svg: RoseRitualSvg },
-  { name: 'Saffron Glow',  nameAr: 'ثلاثية الزعفران',          price: 'KD 38.000', stars: '★★★★★', badge: '',            badgeNew: false, bg: 'c6', Svg: SaffronGlowSvg },
+  { name: 'Velvet Rouge',  nameAr: 'أحمر شفاه مخملي',          price: 'KWD 18.500', stars: '★★★★★', badge: 'Best Seller', badgeNew: false, bg: 'c1', Svg: VelvetRougeSvg },
+  { name: 'Desert Dusk',   nameAr: 'باليت غروب الصحراء',       price: 'KWD 34.000', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c2', Svg: DesertDuskSvg },
+  { name: 'Golden Hour',   nameAr: 'كونسيلر الساعة الذهبية',   price: 'KWD 22.000', stars: '★★★★☆', badge: '',            badgeNew: false, bg: 'c3', Svg: GoldenHourSvg },
+  { name: 'Midnight Kohl', nameAr: 'كحل منتصف الليل',          price: 'KWD 16.000', stars: '★★★★★', badge: 'Limited',     badgeNew: false, bg: 'c4', Svg: MidnightKohlSvg },
+  { name: 'Rose Ritual',   nameAr: 'بلاش وردي',                price: 'KWD 26.000', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c5', Svg: RoseRitualSvg },
+  { name: 'Saffron Glow',  nameAr: 'ثلاثية الزعفران',          price: 'KWD 38.000', stars: '★★★★★', badge: '',            badgeNew: false, bg: 'c6', Svg: SaffronGlowSvg },
 ]
 
 /* ─── EYE CAROUSEL ─────────────────────────────────────────── */
@@ -207,10 +207,10 @@ function BrowSculptSvg() {
 }
 
 const EYE_CARDS = [
-  { name: 'Smoky Nights',  nameAr: 'باليت ليالي الدخان', price: 'KD 28.000', stars: '★★★★★', badge: 'Best Seller', badgeNew: false, bg: 'c2', Svg: SmokyNightsSvg },
-  { name: 'Lash Luxe',     nameAr: 'ماسكارا فاخرة',      price: 'KD 19.500', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c4', Svg: LashLuxeSvg },
-  { name: 'Arabian Kohl',  nameAr: 'كحل عربي أصيل',      price: 'KD 14.000', stars: '★★★★☆', badge: '',            badgeNew: false, bg: 'c1', Svg: ArabianKohlSvg },
-  { name: 'Brow Sculpt',   nameAr: 'محدد الحواجب',        price: 'KD 15.500', stars: '★★★★★', badge: 'Limited',     badgeNew: false, bg: 'c3', Svg: BrowSculptSvg },
+  { name: 'Smoky Nights',  nameAr: 'باليت ليالي الدخان', price: 'KWD 28.000', stars: '★★★★★', badge: 'Best Seller', badgeNew: false, bg: 'c2', Svg: SmokyNightsSvg },
+  { name: 'Lash Luxe',     nameAr: 'ماسكارا فاخرة',      price: 'KWD 19.500', stars: '★★★★★', badge: 'New',         badgeNew: true,  bg: 'c4', Svg: LashLuxeSvg },
+  { name: 'Arabian Kohl',  nameAr: 'كحل عربي أصيل',      price: 'KWD 14.000', stars: '★★★★☆', badge: '',            badgeNew: false, bg: 'c1', Svg: ArabianKohlSvg },
+  { name: 'Brow Sculpt',   nameAr: 'محدد الحواجب',        price: 'KWD 15.500', stars: '★★★★★', badge: 'Limited',     badgeNew: false, bg: 'c3', Svg: BrowSculptSvg },
 ]
 
 /* ─── SHARED CAROUSEL COMPONENT ─────────────────────────────── */

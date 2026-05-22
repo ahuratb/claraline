@@ -217,7 +217,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>Price Range</p>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
           <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'Cairo, sans-serif', letterSpacing: '0.1em' }}>
-            KD 0.000
+            KWD 0.000
           </span>
           <span style={{
             fontSize:    '10px',

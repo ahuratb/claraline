@@ -12,7 +12,7 @@ export default defineType({
       options: { source: 'name_en', maxLength: 96 },
       validation: r => r.required()
     }),
-    defineField({ name: 'price', title: 'Price (KD)', type: 'number', validation: r => r.required().positive() }),
+    defineField({ name: 'price', title: 'Price (KWD)', type: 'number', validation: r => r.required().positive() }),
     defineField({
       name: 'images', title: 'Product Images', type: 'array',
       of: [{
@@ -63,7 +63,7 @@ export default defineType({
     select: { title: 'name_en', subtitle: 'price', media: 'images.0' },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     prepare({ title, subtitle, media }: any) {
-      return { title, subtitle: `KD ${subtitle}`, media }
+      return { title, subtitle: `KWD ${subtitle}`, media }
     }
   }
 })

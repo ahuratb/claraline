@@ -255,7 +255,7 @@ export default async function HomePage() {
               { en: '✦',                         ar: '✦',                    dot: true  },
               { en: 'Tabby — Buy Now Pay Later',  ar: 'تابي — اشتري الآن',  dot: false },
               { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'Free Delivery Over KD 20',  ar: 'توصيل مجاني فوق 20 د', dot: false },
+              { en: 'Free Delivery Over KWD 20',  ar: 'توصيل مجاني فوق 20 د', dot: false },
               { en: '✦',                         ar: '✦',                    dot: true  },
               { en: 'Tamara Available',           ar: 'تمارا متوفرة',         dot: false },
               { en: '✦',                         ar: '✦',                    dot: true  },

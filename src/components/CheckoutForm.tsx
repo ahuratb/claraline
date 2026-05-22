@@ -176,7 +176,7 @@ export default function CheckoutForm() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[var(--muted)]" style={{ fontFamily: 'Cairo, sans-serif' }}>Delivery</span>
-              <span className="text-[var(--champagne)] text-xs">Free over KD 20</span>
+              <span className="text-[var(--champagne)] text-xs">Free over KWD 20</span>
             </div>
             <div className="flex justify-between text-lg font-light border-t border-[rgba(201,169,110,0.15)] pt-3 mt-2">
               <span className="text-[var(--ivory)]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Total</span>

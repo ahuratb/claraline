@@ -1,5 +1,5 @@
 export function formatPrice(price: number): string {
-  return `KD ${price.toFixed(3)}`
+  return `KWD ${price.toFixed(3)}`
 }
 
 export function generateOrderId(): string {
