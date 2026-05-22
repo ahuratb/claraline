@@ -136,9 +136,24 @@ body:has(button:hover) #cursor-ring { width: 56px; height: 56px; }
 
 /* TOUCH DEVICES — hide cursor dot/ring, restore normal pointer */
 @media (hover: none) and (pointer: coarse) {
-  #cursor, #cursor-ring { display: none !important; }
-  body { cursor: default !important; }
+  #cursor,
+  #cursor-ring {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  body, body * { cursor: auto !important; }
   a, button, [role="button"] { cursor: pointer !important; }
+}
+/* Belt-and-braces: either media feature alone is enough to disable */
+@media (hover: none) {
+  #cursor, #cursor-ring { display: none !important; pointer-events: none !important; }
+  body, body * { cursor: auto !important; }
+}
+@media (pointer: coarse) {
+  #cursor, #cursor-ring { display: none !important; pointer-events: none !important; }
+  body, body * { cursor: auto !important; }
 }
 
 /* GRAIN */
