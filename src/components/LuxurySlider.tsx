@@ -2,7 +2,22 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
-const SLIDES = [
+interface Slide {
+  id: number
+  label: string
+  labelAr: string
+  headline: string
+  headlineAr: string
+  sub: string
+  subAr: string
+  cta: string
+  ctaAr: string
+  href: string
+  bg: string
+  image?: string
+}
+
+const SLIDES: Slide[] = [
   {
     id: 1,
     label: 'New Collection · 2024',
@@ -14,33 +29,36 @@ const SLIDES = [
     cta: 'Discover Now',
     ctaAr: 'اكتشفي الآن',
     href: '/shop',
-    bg: 'radial-gradient(ellipse at 30% 60%,#2a1208 0%,#0a0806 55%),radial-gradient(ellipse at 80% 20%,#1a0e18 0%,transparent 60%)',
+    bg: 'radial-gradient(ellipse at 30% 60%,#2a0608 0%,#0a0606 55%),radial-gradient(ellipse at 80% 20%,#1a0810 0%,transparent 60%)',
+    image: '/slider-4.png',
   },
   {
     id: 2,
-    label: 'Eye Collection',
-    labelAr: 'مجموعة العيون',
-    headline: 'Eyes that<br/>speak <em>volumes</em>',
-    headlineAr: 'عيون<br/>تتحدث <em>بصمت</em>',
-    sub: 'Smoky nights, defined lashes, arabian kohl',
-    subAr: 'ليالٍ دخانية، رموش محددة، كحل عربي',
-    cta: 'Eye Collection',
-    ctaAr: 'مجموعة العيون',
-    href: '#products2',
-    bg: 'radial-gradient(ellipse at 70% 40%,#1a1230 0%,#080810 55%),radial-gradient(ellipse at 20% 80%,#1a0a18 0%,transparent 60%)',
+    label: 'Lip Collection',
+    labelAr: 'مجموعة الشفاه',
+    headline: 'Lips that<br/>speak <em>softly</em>',
+    headlineAr: 'شفاه<br/><em>تهمس</em>',
+    sub: 'Velvet finish, lasting comfort',
+    subAr: 'لمسة مخملية تدوم بكل راحة',
+    cta: 'Lip Collection',
+    ctaAr: 'مجموعة الشفاه',
+    href: '#products1',
+    bg: 'radial-gradient(ellipse at 70% 40%,#0e1c2a 0%,#060a14 55%),radial-gradient(ellipse at 20% 80%,#1a0e12 0%,transparent 60%)',
+    image: '/slider-2.png',
   },
   {
     id: 3,
-    label: 'Desert Gold',
-    labelAr: 'ذهب الصحراء',
-    headline: 'Born from<br/><em>Kuwait</em>',
-    headlineAr: 'وُلد في قلب<br/><em>الكويت</em>',
-    sub: 'Formulated for Gulf skin, inspired by the desert',
-    subAr: 'مُصاغ لبشرة الخليج، مستلهم من الصحراء',
+    label: 'Radiant Skin',
+    labelAr: 'بشرة مُشرقة',
+    headline: 'Light that<br/><em>belongs</em> to you',
+    headlineAr: 'إشراقة<br/><em>تليق</em> بكِ',
+    sub: 'Powder finish, formulated for Gulf skin',
+    subAr: 'بودرة مُصاغة خصيصاً لبشرة الخليج',
     cta: 'Our Story',
     ctaAr: 'قصتنا',
     href: '/#ritual',
-    bg: 'radial-gradient(ellipse at 50% 30%,#1a1208 0%,#0a0806 55%),radial-gradient(ellipse at 80% 70%,#1a0e08 0%,transparent 60%)',
+    bg: 'radial-gradient(ellipse at 50% 30%,#0e1322 0%,#06080e 55%),radial-gradient(ellipse at 80% 70%,#1a1008 0%,transparent 60%)',
+    image: '/slider-3.png',
   },
   {
     id: 4,
@@ -74,9 +92,11 @@ export default function LuxurySlider() {
 
   const slide = SLIDES[current]
 
+  const hasImage = !!slide.image
+
   return (
     <div
-      className="luxury-slider"
+      className={`luxury-slider${hasImage ? ' ls-split' : ''}`}
       onMouseEnter={() => { pausedRef.current = true }}
       onMouseLeave={() => { pausedRef.current = false }}
     >
@@ -87,6 +107,19 @@ export default function LuxurySlider() {
           className="ls-bg"
           style={{ background: s.bg, opacity: i === current ? 1 : 0 }}
         />
+      ))}
+
+      {/* Crossfading model images */}
+      {SLIDES.map((s, i) => (
+        s.image ? (
+          <div
+            key={`img-${s.id}`}
+            className={`ls-image${i === current ? ' active' : ''}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={s.image} alt="" />
+          </div>
+        ) : null
       ))}
 
       {/* Corner frame decoration */}
@@ -104,7 +137,7 @@ export default function LuxurySlider() {
       </div>
 
       {/* Animated content — key remounts on slide change, firing CSS animation */}
-      <div key={current} className="ls-content">
+      <div key={current} className={`ls-content${hasImage ? ' ls-content-left' : ''}`}>
         <span className="ls-label en-only">{slide.label}</span>
         <span className="ls-label ar-only">{slide.labelAr}</span>
         <h2 className="ls-headline en-only" dangerouslySetInnerHTML={{ __html: slide.headline }} />

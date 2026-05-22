@@ -122,7 +122,7 @@ export default function CartDrawer() {
               height: '100%', textAlign: 'center', gap: '20px',
             }}>
               <p style={{
-                color: 'var(--muted)', fontStyle: 'italic', fontSize: '18px',
+                color: 'var(--muted)', fontSize: '18px',
                 fontFamily: 'Cormorant Garamond, serif',
               }}>
                 Your bag is empty

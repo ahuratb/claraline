@@ -1,13 +1,18 @@
 import VideoScroll from '@/components/VideoScroll'
 import { LipCarousel, EyeCarousel } from '@/components/CinematicCarousel'
-import RitualSection from '@/components/RitualSection'
 import NewsletterForm from '@/components/NewsletterForm'
 import CategoryGrid from '@/components/CategoryGrid'
 import LuxurySlider from '@/components/LuxurySlider'
+import { getProductsByCollection } from '@/lib/sanity'
 
 export const revalidate = 3600
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [lipProducts, eyeProducts] = await Promise.all([
+    getProductsByCollection('lip'),
+    getProductsByCollection('eye'),
+  ])
+
   return (
     <main className="home-page">
 
@@ -15,34 +20,14 @@ export default function HomePage() {
       <VideoScroll
         src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/1.mp4"
         sectionHeight="500vh"
+        maxSeconds={1}
         overlays={[
           {
             id: 't1a',
-            startPct: 0.05, endPct: 0.35,
-            eyebrow: 'Kuwait Luxury Beauty · Est. 2024',
-            eyebrowAr: 'جمال الكويت الفاخر · تأسست 2024',
+            startPct: 0.05, endPct: 0.95,
             headlineHtml: '<img src="/logo.png" alt="Claraline" style="height:56px;width:auto;display:block;margin:0 auto 12px;object-fit:contain" /><em>Unveiled</em>',
             headlineHtmlAr: '<img src="/logo.png" alt="Claraline" style="height:56px;width:auto;display:block;margin:0 auto 12px;object-fit:contain" /><em>كُشف عنها</em>',
-            sublineEn: 'Beauty that tells a story',
-            sublineAr: 'جمالٌ يُروى، وسحرٌ يُعاش',
-          },
-          {
-            id: 't1b',
-            startPct: 0.45, endPct: 0.72,
-            eyebrow: 'The Collection',
-            eyebrowAr: 'المجموعة',
-            headlineHtml: 'Gathered<br/><em>with care</em>',
-            headlineHtmlAr: 'جُمع<br/><em>بعناية</em>',
-            headlineFontSize: '52px',
-            position: { bottom: '18%', left: '50%', right: 'auto', top: 'auto', transform: 'translateX(-50%)', textAlign: 'center' },
-          },
-          {
-            id: 't1c',
-            startPct: 0.8, endPct: 1.0,
-            headlineHtml: '<em>Made</em><br/>for you',
-            headlineHtmlAr: '<em>صُنع</em><br/>لكِ',
-            headlineFontSize: '64px',
-            cta: { label: 'Explore Now', labelAr: 'اكتشفي الآن', scrollTo: 'products1' },
+            cta: { label: 'Shop Now', labelAr: 'تسوقي الآن', href: '/shop' },
           },
         ]}
       />
@@ -50,7 +35,7 @@ export default function HomePage() {
       {/* ══════════════════ LIP CAROUSEL ══════════════════ */}
       <div className="fixed-section" id="products1">
         <div className="sep"></div>
-        <LipCarousel />
+        <LipCarousel products={lipProducts} />
         <div className="sep"></div>
       </div>
 
@@ -65,6 +50,7 @@ export default function HomePage() {
         <div className="video-row-half">
           <VideoScroll
             src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/2.mp4"
+            maxSeconds={0.5}
             overlays={[
               {
                 id: 't2a',
@@ -89,6 +75,7 @@ export default function HomePage() {
         <div className="video-row-half">
           <VideoScroll
             src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/5.mp4"
+            maxSeconds={0.5}
             overlays={[
               {
                 id: 't5a',
@@ -104,9 +91,6 @@ export default function HomePage() {
           />
         </div>
       </div>
-
-      {/* ══════════════════ RITUAL SECTION ══════════════════ */}
-      <RitualSection />
 
       {/* ══════════════════ MARQUEE + STATS ══════════════════ */}
       <div className="fixed-section">
@@ -197,7 +181,7 @@ export default function HomePage() {
       {/* ══════════════════ EYE CAROUSEL ══════════════════ */}
       <div className="fixed-section" id="products2">
         <div className="sep"></div>
-        <EyeCarousel />
+        <EyeCarousel products={eyeProducts} />
         <div className="sep"></div>
       </div>
 

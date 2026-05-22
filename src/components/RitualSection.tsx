@@ -45,7 +45,7 @@ export default function RitualSection() {
               <path d="M87 99 Q100 108 113 99" stroke="rgba(201,169,110,0.65)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               <circle cx="100" cy="205" r="34" fill="none" stroke="rgba(201,169,110,0.1)" strokeWidth="0.5"/>
               <circle cx="100" cy="205" r="22" fill="none" stroke="rgba(201,169,110,0.14)" strokeWidth="0.5"/>
-              <text x="100" y="209" textAnchor="middle" fontFamily="'Cormorant Garamond',serif" fontSize="11" fill="rgba(201,169,110,0.7)" fontStyle="italic">claraline</text>
+              <text x="100" y="209" textAnchor="middle" fontFamily="'Cormorant Garamond',serif" fontSize="11" fill="rgba(201,169,110,0.7)">claraline</text>
             </svg>
           </div>
         </div>

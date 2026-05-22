@@ -1,8 +1,27 @@
 'use client'
 import { useState, useRef, type ReactNode } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
+import { Product } from '@/types'
+import { urlFor } from '@/lib/sanity'
+import { useCartStore } from '@/lib/store'
+import { formatPrice } from '@/lib/utils'
 
 const CARD_W = 280 + 24
+
+const BADGE_LABEL: Record<string, { label: string; isNew?: boolean }> = {
+  new:        { label: 'New', isNew: true },
+  bestseller: { label: 'Best Seller' },
+  limited:    { label: 'Limited' },
+}
+
+const COLLECTION_BG: Record<string, string> = {
+  lip:  'c1',
+  eye:  'c2',
+  face: 'c5',
+  gift: 'c4',
+}
 
 function quickAdd(nameEn: string, nameAr: string) {
   const isAr = document.documentElement.classList.contains('lang-ar')
@@ -204,13 +223,35 @@ interface CarouselProps {
   titleAr: ReactNode
   descEn: string
   descAr: string
-  cards: typeof LIP_CARDS
+  cards?: typeof LIP_CARDS
+  products?: Product[]
 }
 
-function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, cards }: CarouselProps) {
+function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, cards, products }: CarouselProps) {
+  const addItem = useCartStore(s => s.addItem)
+  const openCart = useCartStore(s => s.openCart)
+  const useReal = !!(products && products.length > 0)
+  const itemCount = useReal ? products!.length : (cards?.length ?? 0)
   const [offset, setOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
-  const max = Math.max(0, (cards.length - 3) * CARD_W)
+  const max = Math.max(0, (itemCount - 3) * CARD_W)
+
+  function handleProductAdd(e: React.MouseEvent, p: Product) {
+    e.preventDefault()
+    e.stopPropagation()
+    const image = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : undefined
+    addItem({
+      productId: p._id,
+      name_en:   p.name_en,
+      name_ar:   p.name_ar,
+      price:     p.price,
+      quantity:  1,
+      image,
+    })
+    const isAr = document.documentElement.classList.contains('lang-ar')
+    toast.success(`${isAr ? p.name_ar : p.name_en} — ${isAr ? 'أُضيف للحقيبة ✦' : 'added to bag ✦'}`)
+    openCart()
+  }
 
   const touchStartX    = useRef(0)
   const touchStartOff  = useRef(0)
@@ -293,37 +334,74 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
           id={id}
           style={{ transform: `translateX(-${offset}px)`, transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)' }}
         >
-          {cards.map(card => (
-            <div key={card.name} className="p-card" onClick={() => quickAdd(card.name, card.nameAr)}>
-              <div className="p-card-img">
-                <div className={`p-card-img-bg ${card.bg}`}></div>
-                <card.Svg />
-                {card.badge && (
-                  <span className={`p-badge${card.badgeNew ? ' new' : ''}`}>{card.badge}</span>
-                )}
-                <div className="p-quick-add">
-                  <span className="en-only">Quick Add</span>
-                  <span className="ar-only">أضف للحقيبة</span>
-                  <span className="p-quick-add-plus">+</span>
+          {useReal
+            ? products!.map(p => {
+                const img = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : null
+                const badge = p.badge ? BADGE_LABEL[p.badge] : null
+                const bg = COLLECTION_BG[p.collection] ?? 'c1'
+                return (
+                  <Link key={p._id} href={`/product/${p.slug.current}`} className="p-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="p-card-img">
+                      <div className={`p-card-img-bg ${bg}`}></div>
+                      {img && (
+                        <Image
+                          src={img}
+                          alt={p.name_en}
+                          fill
+                          sizes="280px"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      )}
+                      {badge && (
+                        <span className={`p-badge${badge.isNew ? ' new' : ''}`}>{badge.label}</span>
+                      )}
+                      <div className="p-quick-add" onClick={(e) => handleProductAdd(e, p)}>
+                        <span className="en-only">Quick Add</span>
+                        <span className="ar-only">أضف للحقيبة</span>
+                        <span className="p-quick-add-plus">+</span>
+                      </div>
+                    </div>
+                    <div className="p-info">
+                      <div className="p-name en-only">{p.name_en}</div>
+                      <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{p.name_ar}</div>
+                      <div className="p-price-row">
+                        <span className="p-price">{formatPrice(p.price)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })
+            : cards!.map(card => (
+              <div key={card.name} className="p-card" onClick={() => quickAdd(card.name, card.nameAr)}>
+                <div className="p-card-img">
+                  <div className={`p-card-img-bg ${card.bg}`}></div>
+                  <card.Svg />
+                  {card.badge && (
+                    <span className={`p-badge${card.badgeNew ? ' new' : ''}`}>{card.badge}</span>
+                  )}
+                  <div className="p-quick-add">
+                    <span className="en-only">Quick Add</span>
+                    <span className="ar-only">أضف للحقيبة</span>
+                    <span className="p-quick-add-plus">+</span>
+                  </div>
+                </div>
+                <div className="p-info">
+                  <div className="p-name en-only">{card.name}</div>
+                  <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{card.nameAr}</div>
+                  <div className="p-price-row">
+                    <span className="p-price">{card.price}</span>
+                    <div className="p-stars"><span className="p-star">{card.stars}</span></div>
+                  </div>
                 </div>
               </div>
-              <div className="p-info">
-                <div className="p-name en-only">{card.name}</div>
-                <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{card.nameAr}</div>
-                <div className="p-price-row">
-                  <span className="p-price">{card.price}</span>
-                  <div className="p-stars"><span className="p-star">{card.stars}</span></div>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
   )
 }
 
-export function LipCarousel() {
+export function LipCarousel({ products }: { products?: Product[] }) {
   return (
     <Carousel
       id="c1"
@@ -334,11 +412,12 @@ export function LipCarousel() {
       descEn="The lipstick that tells your story"
       descAr="أحمر الشفاه الذي يروي قصتك"
       cards={LIP_CARDS}
+      products={products}
     />
   )
 }
 
-export function EyeCarousel() {
+export function EyeCarousel({ products }: { products?: Product[] }) {
   return (
     <Carousel
       id="c2"
@@ -349,6 +428,7 @@ export function EyeCarousel() {
       descEn="Eyes that tell a thousand stories"
       descAr="عيون تحكي ألف قصة"
       cards={EYE_CARDS}
+      products={products}
     />
   )
 }

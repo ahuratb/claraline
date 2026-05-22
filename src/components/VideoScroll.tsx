@@ -21,9 +21,10 @@ interface VideoScrollProps {
   src: string
   overlays: Overlay[]
   sectionHeight?: string
+  maxSeconds?: number
 }
 
-export default function VideoScroll({ src, overlays, sectionHeight = '400vh' }: VideoScrollProps) {
+export default function VideoScroll({ src, overlays, sectionHeight = '400vh', maxSeconds }: VideoScrollProps) {
   const sectionRef  = useRef<HTMLDivElement>(null)
   const videoRef    = useRef<HTMLVideoElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
@@ -52,7 +53,8 @@ export default function VideoScroll({ src, overlays, sectionHeight = '400vh' }: 
 
         if (progressRef.current) progressRef.current.style.width = `${p * 100}%`
         if (video.duration && !isNaN(video.duration)) {
-          const target = p * video.duration
+          const span = maxSeconds ? Math.min(maxSeconds, video.duration) : video.duration
+          const target = p * span
           if (Math.abs(video.currentTime - target) > 0.08) video.currentTime = target
         }
         setProgress(p)
@@ -65,7 +67,7 @@ export default function VideoScroll({ src, overlays, sectionHeight = '400vh' }: 
       window.removeEventListener('scroll', handleScroll)
       video.removeEventListener('play', keepPaused)
     }
-  }, [])
+  }, [maxSeconds])
 
   const PAD = 0.06
   function cls(o: Overlay) {

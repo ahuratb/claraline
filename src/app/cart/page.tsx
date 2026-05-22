@@ -16,7 +16,7 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           <div className="py-24 text-center space-y-6">
-            <p className="text-[var(--muted)] text-xl italic" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Your bag is empty</p>
+            <p className="text-[var(--muted)] text-xl" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Your bag is empty</p>
             <Link href="/shop" className="inline-block text-[9px] tracking-[0.3em] uppercase text-[var(--champagne)] border border-[rgba(201,169,110,0.4)] px-8 py-4 hover:bg-[rgba(201,169,110,0.08)] transition-all no-underline" style={{ fontFamily: 'Cairo, sans-serif' }}>
               Shop Collection
             </Link>

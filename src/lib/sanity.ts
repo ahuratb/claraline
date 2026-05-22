@@ -20,18 +20,26 @@ export const client = createClient({
 const builder = createImageUrlBuilder(client)
 export const urlFor = (source: SanityImageSource) => builder.image(source)
 
-export async function getFeaturedProducts(): Promise<Product[]> {
-  if (!isSanityConfigured) return []
-  return client.fetch(`
+async function safeFetch<T>(query: string, params?: Record<string, unknown>, fallback: T[] = []): Promise<T[]> {
+  if (!isSanityConfigured) return fallback
+  try {
+    return await client.fetch<T[]>(query, params ?? {})
+  } catch (e) {
+    console.warn('[sanity] fetch failed, falling back to empty list:', (e as Error)?.message)
+    return fallback
+  }
+}
+
+export function getFeaturedProducts(): Promise<Product[]> {
+  return safeFetch<Product>(`
     *[_type == "product" && featured == true && inStock == true] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, description_ar
     }
   `)
 }
 
-export async function getProductsByCollection(collection: string): Promise<Product[]> {
-  if (!isSanityConfigured) return []
-  return client.fetch(
+export function getProductsByCollection(collection: string): Promise<Product[]> {
+  return safeFetch<Product>(
     `*[_type == "product" && collection == $collection && inStock == true] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, shades
     }`,
@@ -39,9 +47,8 @@ export async function getProductsByCollection(collection: string): Promise<Produ
   )
 }
 
-export async function getAllProducts(): Promise<Product[]> {
-  if (!isSanityConfigured) return []
-  return client.fetch(`
+export function getAllProducts(): Promise<Product[]> {
+  return safeFetch<Product>(`
     *[_type == "product" && inStock == true] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, featured
     }

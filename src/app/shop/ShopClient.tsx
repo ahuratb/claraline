@@ -150,7 +150,6 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 <span style={{
                   fontSize:    active ? '14px' : '13px',
                   fontFamily:  "'Cormorant Garamond', serif",
-                  fontStyle:   active ? 'italic' : 'normal',
                   fontWeight:  300,
                   color:       active ? 'var(--champagne)' : 'var(--ivory)',
                   letterSpacing: '0.02em',
@@ -349,7 +348,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
             letterSpacing: '-0.01em',
           }}
         >
-          The <em style={{ fontStyle: 'italic', color: 'var(--champagne)' }}>Collection</em>
+          The <em style={{ color: 'var(--champagne)' }}>Collection</em>
         </h1>
         <p
           style={{
@@ -497,7 +496,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 fontFamily:  'Cairo, sans-serif',
                 letterSpacing: '0.1em',
               }}>
-                <span style={{ color: 'var(--champagne)', fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', fontStyle: 'italic', marginRight: '4px' }}>
+                <span style={{ color: 'var(--champagne)', fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', marginRight: '4px' }}>
                   {displayed.length}
                 </span>
                 product{displayed.length !== 1 ? 's' : ''}
@@ -555,7 +554,6 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 fontWeight:  300,
                 color:       'rgba(250,245,238,0.12)',
                 fontFamily:  "'Cormorant Garamond', serif",
-                fontStyle:   'italic',
                 marginBottom: '12px',
               }}>
                 Nothing here
