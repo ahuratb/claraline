@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
@@ -8,8 +8,9 @@ import Image from 'next/image'
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, total } = useCartStore()
   const cartTotal = total()
+  const drawerRef = useRef<HTMLDivElement>(null)
 
-  // Escape key closes
+  // Escape closes
   useEffect(() => {
     if (!isOpen) return
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeCart() }
@@ -17,44 +18,84 @@ export default function CartDrawer() {
     return () => window.removeEventListener('keydown', onKey)
   }, [isOpen, closeCart])
 
-  // Body scroll lock while open
+  // Lock body scroll while open
   useEffect(() => {
-    if (isOpen) {
-      const prev = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = prev }
-    }
+    if (!isOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
   }, [isOpen])
+
+  // Swipe-right to close (touch only)
+  useEffect(() => {
+    const el = drawerRef.current
+    if (!el || !isOpen) return
+    let startX = 0
+    let startY = 0
+    let dragging = false
+    const SWIPE_THRESHOLD = 60
+
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      dragging = true
+      el.style.transition = 'none'
+    }
+    const onMove = (e: TouchEvent) => {
+      if (!dragging || e.touches.length !== 1) return
+      const dx = e.touches[0].clientX - startX
+      const dy = e.touches[0].clientY - startY
+      // Only horizontal — ignore if mostly vertical (item list scrolling)
+      if (Math.abs(dy) > Math.abs(dx)) { dragging = false; el.style.transform = ''; el.style.transition = ''; return }
+      if (dx > 0) el.style.transform = `translateX(${dx}px)`
+    }
+    const onEnd = (e: TouchEvent) => {
+      if (!dragging) return
+      dragging = false
+      const dx = (e.changedTouches[0]?.clientX ?? startX) - startX
+      el.style.transition = ''
+      el.style.transform = ''
+      if (dx > SWIPE_THRESHOLD) closeCart()
+    }
+
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchmove', onMove, { passive: true })
+    el.addEventListener('touchend', onEnd, { passive: true })
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
+      el.removeEventListener('touchend', onEnd)
+    }
+  }, [isOpen, closeCart])
 
   return (
     <>
-      {/* Backdrop — z-index 400, above bottom-nav (300), below drawer (401).
-          Hidden on mobile (≤768px) via the .cart-backdrop class so taps on
-          underlying page items remain functional with the cart open. */}
+      {/* Backdrop — covers everything including bottom-nav, click closes */}
       <div
-        className="cart-backdrop"
         onClick={closeCart}
         style={{
-          position: 'fixed', inset: 0, zIndex: 400,
-          background: 'rgba(0,0,0,0.65)',
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
+          position: 'fixed', inset: 0, zIndex: 9998,
+          background: 'rgba(0,0,0,0.7)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? 'auto' : 'none',
           transition: 'opacity 0.35s ease',
           cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent',
-          touchAction: 'manipulation',
         }}
         aria-hidden={!isOpen}
       />
 
-      {/* Drawer — z-index 401, top of stacking. Bottom is responsive (sees .cart-drawer-root) */}
-      <div
-        className="cart-drawer-root"
+      {/* Drawer */}
+      <aside
+        ref={drawerRef}
+        className="drawer-panel"
         onClick={(e) => e.stopPropagation()}
         style={{
-          position: 'fixed', top: 0, right: 0, zIndex: 401,
+          position: 'fixed', top: 0, right: 0, bottom: 0,
+          zIndex: 9999,
           width: '420px', maxWidth: '100vw',
           background: 'var(--obsidian)',
           borderLeft: '0.5px solid rgba(201,169,110,0.15)',
@@ -68,53 +109,37 @@ export default function CartDrawer() {
         aria-modal="true"
         aria-hidden={!isOpen}
       >
-        {/* Header */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '24px 32px',
-          borderBottom: '0.5px solid rgba(201,169,110,0.1)',
-          flexShrink: 0,
-        }}>
+        {/* Header — fixed 60px row with absolutely positioned close button */}
+        <div className="drawer-header">
           <div>
-            <h2 style={{
-              color: 'var(--champagne)', fontWeight: 300,
-              letterSpacing: '0.3em', textTransform: 'uppercase',
-              fontSize: '13px', fontFamily: 'Cormorant Garamond, serif',
-            }}>
-              Your Bag
-            </h2>
-            <p style={{
-              color: 'var(--muted)', fontSize: '10px',
-              letterSpacing: '0.2em', marginTop: '4px',
-              fontFamily: 'Cairo, sans-serif',
-            }}>
+            <h2 className="drawer-title">Your Bag</h2>
+            <p className="drawer-subtitle">
               {items.length} {items.length === 1 ? 'item' : 'items'}
             </p>
           </div>
           <button
             type="button"
+            className="drawer-close"
             onClick={closeCart}
             aria-label="Close cart"
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--muted)', fontSize: '28px', lineHeight: 1,
-              padding: '8px 12px', transition: 'color 0.2s',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--ivory)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--muted)' }}
           >
-            ×
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
 
         {/* Items */}
-        <div style={{
-          flex: 1, overflowY: 'auto',
-          padding: '24px 32px',
-          display: 'flex', flexDirection: 'column', gap: '24px',
-          WebkitOverflowScrolling: 'touch',
-        }}>
+        <div
+          className="drawer-body"
+          style={{
+            flex: 1, overflowY: 'auto',
+            padding: '24px 24px',
+            display: 'flex', flexDirection: 'column', gap: '24px',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           {items.length === 0 ? (
             <div style={{
               display: 'flex', flexDirection: 'column',
@@ -152,8 +177,9 @@ export default function CartDrawer() {
               <div key={`${item.productId}-${item.shade}`} style={{ display: 'flex', gap: '16px' }}>
                 <div style={{
                   width: '76px', height: '92px',
-                  background: 'var(--deep)', flexShrink: 0,
+                  background: '#2a2a2e', flexShrink: 0,
                   position: 'relative', overflow: 'hidden',
+                  borderRadius: '8px',
                 }}>
                   {item.image ? (
                     <Image src={item.image} alt={item.name_en} fill style={{ objectFit: 'cover' }} />
@@ -202,12 +228,11 @@ export default function CartDrawer() {
                       type="button"
                       onClick={() => updateQuantity(item.productId, item.quantity - 1, item.shade)}
                       style={{
-                        width: '26px', height: '26px',
+                        width: '28px', height: '28px',
                         border: '0.5px solid rgba(201,169,110,0.3)',
                         background: 'transparent', color: 'var(--muted)',
                         cursor: 'pointer', fontSize: '16px', lineHeight: 1,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'border-color 0.2s, color 0.2s',
                         WebkitTapHighlightColor: 'transparent',
                       }}
                     >−</button>
@@ -221,12 +246,11 @@ export default function CartDrawer() {
                       type="button"
                       onClick={() => updateQuantity(item.productId, item.quantity + 1, item.shade)}
                       style={{
-                        width: '26px', height: '26px',
+                        width: '28px', height: '28px',
                         border: '0.5px solid rgba(201,169,110,0.3)',
                         background: 'transparent', color: 'var(--muted)',
                         cursor: 'pointer', fontSize: '16px', lineHeight: 1,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'border-color 0.2s, color 0.2s',
                         WebkitTapHighlightColor: 'transparent',
                       }}
                     >+</button>
@@ -237,8 +261,7 @@ export default function CartDrawer() {
                         marginLeft: 'auto', background: 'none', border: 'none',
                         color: 'var(--muted)', fontSize: '9px',
                         letterSpacing: '0.2em', textTransform: 'uppercase',
-                        cursor: 'pointer', transition: 'color 0.2s',
-                        fontFamily: 'Cairo, sans-serif',
+                        cursor: 'pointer', fontFamily: 'Cairo, sans-serif',
                         WebkitTapHighlightColor: 'transparent',
                       }}
                     >
@@ -254,7 +277,7 @@ export default function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && (
           <div style={{
-            padding: '24px 32px', flexShrink: 0,
+            padding: '24px', flexShrink: 0,
             borderTop: '0.5px solid rgba(201,169,110,0.1)',
           }}>
             <div style={{
@@ -291,14 +314,14 @@ export default function CartDrawer() {
                 textAlign: 'center', fontSize: '9px',
                 letterSpacing: '0.3em', textTransform: 'uppercase',
                 fontWeight: 700, fontFamily: 'Cairo, sans-serif',
-                textDecoration: 'none', transition: 'background 0.3s',
+                textDecoration: 'none', borderRadius: '4px',
               }}
             >
               Proceed to Checkout
             </Link>
           </div>
         )}
-      </div>
+      </aside>
     </>
   )
 }

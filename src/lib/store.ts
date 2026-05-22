@@ -4,15 +4,21 @@ import { CartItem } from '@/types'
 
 interface CartStore {
   items: CartItem[]
-  isOpen: boolean
+  isOpen: boolean        // cart drawer
+  isMenuOpen: boolean    // side / mobile menu drawer
   addItem: (item: CartItem) => void
   removeItem: (productId: string, shade?: string) => void
   updateQuantity: (productId: string, quantity: number, shade?: string) => void
   clearCart: () => void
+  // Drawer actions — mutex: opening one closes the other.
   openCart: () => void
   closeCart: () => void
+  openMenu: () => void
+  closeMenu: () => void
+  closeAll: () => void
   total: () => number
   count: () => number
+  isAnyDrawerOpen: () => boolean
 }
 
 export const useCartStore = create<CartStore>()(
@@ -20,6 +26,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      isMenuOpen: false,
 
       addItem: (item) => set(state => {
         const existing = state.items.find(
@@ -54,10 +61,17 @@ export const useCartStore = create<CartStore>()(
       })),
 
       clearCart: () => set({ items: [] }),
-      openCart: () => set({ isOpen: true }),
+
+      // Mutex drawer actions
+      openCart:  () => set({ isOpen: true,  isMenuOpen: false }),
       closeCart: () => set({ isOpen: false }),
+      openMenu:  () => set({ isMenuOpen: true,  isOpen: false }),
+      closeMenu: () => set({ isMenuOpen: false }),
+      closeAll:  () => set({ isOpen: false, isMenuOpen: false }),
+
       total: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
       count: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
+      isAnyDrawerOpen: () => get().isOpen || get().isMenuOpen,
     }),
     {
       name: 'claraline-cart',
