@@ -342,6 +342,26 @@ video.hero-vid {
 .revealed .test-card { opacity: 1; transform: translateY(0); }
 .revealed .stat-item { opacity: 1; transform: translateY(0); }
 
+/* CSS safety net — if observer missed an element after 3.5s, force it visible */
+@keyframes safeReveal { to { opacity: 1; transform: none; } }
+.reveal-target:not(.revealed),
+.reveal-target:not(.revealed) .section-label,
+.reveal-target:not(.revealed) .section-title,
+.reveal-target:not(.revealed) .section-body-ar,
+.reveal-target:not(.revealed) .carousel-nav,
+.reveal-target:not(.revealed) .p-card,
+.reveal-target:not(.revealed) .r-label,
+.reveal-target:not(.revealed) .r-heading,
+.reveal-target:not(.revealed) .r-body,
+.reveal-target:not(.revealed) .r-link,
+.reveal-target:not(.revealed) .sc-label,
+.reveal-target:not(.revealed) .sc-title,
+.reveal-target:not(.revealed) .feature-card,
+.reveal-target:not(.revealed) .test-card,
+.reveal-target:not(.revealed) .stat-item {
+  animation: safeReveal 0.5s ease 3.5s forwards;
+}
+
 /* MARQUEE */
 .marquee { padding: 22px 0 14px; overflow: hidden; white-space: nowrap; border-top: 0.5px solid rgba(201,169,110,0.08); border-bottom: 0.5px solid rgba(201,169,110,0.08); }
 .marquee-track { display: inline-flex; animation: marquee 28s linear infinite; }

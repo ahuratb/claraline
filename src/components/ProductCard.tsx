@@ -45,7 +45,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect() } },
-      { threshold: 0.08 }
+      { threshold: 0, rootMargin: '0px 0px -40px 0px' }
     )
     obs.observe(el)
     return () => obs.disconnect()
