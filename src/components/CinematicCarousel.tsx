@@ -225,9 +225,10 @@ interface CarouselProps {
   descAr: string
   cards?: typeof LIP_CARDS
   products?: Product[]
+  viewAllHref?: string
 }
 
-function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, cards, products }: CarouselProps) {
+function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, cards, products, viewAllHref }: CarouselProps) {
   const addItem = useCartStore(s => s.addItem)
   const openCart = useCartStore(s => s.openCart)
   const useReal = !!(products && products.length > 0)
@@ -277,8 +278,8 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
   }
 
   function onMouseDown(e: React.MouseEvent) {
-    isDragging.current   = true
-    mouseStartX.current  = e.clientX
+    isDragging.current    = true
+    mouseStartX.current   = e.clientX
     mouseStartOff.current = offset
     setDragging(true)
     e.preventDefault()
@@ -296,8 +297,70 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
     setOffset(Math.max(0, Math.min(max, snapped)))
   }
 
+  /* ── Card renderers (shared between carousel + mobile grid) ── */
+
+  function renderRealCard(p: Product) {
+    const img = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : null
+    const badge = p.badge ? BADGE_LABEL[p.badge] : null
+    const bg = COLLECTION_BG[p.collection] ?? 'c1'
+    return (
+      <Link key={p._id} href={`/product/${p.slug.current}`} className="p-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className="p-card-img">
+          <div className={`p-card-img-bg ${bg}`} />
+          {img && (
+            <Image src={img} alt={p.name_en} fill sizes="280px" style={{ objectFit: 'cover' }} />
+          )}
+          {badge && (
+            <span className={`p-badge${badge.isNew ? ' new' : ''}`}>{badge.label}</span>
+          )}
+          <div className="p-quick-add" onClick={(e) => handleProductAdd(e, p)}>
+            <span className="en-only">Quick Add</span>
+            <span className="ar-only">أضف للحقيبة</span>
+            <span className="p-quick-add-plus">+</span>
+          </div>
+        </div>
+        <div className="p-info">
+          <div className="p-name en-only">{p.name_en}</div>
+          <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{p.name_ar}</div>
+          <div className="p-price-row">
+            <span className="p-price">{formatPrice(p.price)}</span>
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
+  function renderDemoCard(card: typeof LIP_CARDS[0]) {
+    const SvgComp = card.Svg
+    return (
+      <div key={card.name} className="p-card" onClick={() => quickAdd(card.name, card.nameAr)}>
+        <div className="p-card-img">
+          <div className={`p-card-img-bg ${card.bg}`} />
+          <SvgComp />
+          {card.badge && (
+            <span className={`p-badge${card.badgeNew ? ' new' : ''}`}>{card.badge}</span>
+          )}
+          <div className="p-quick-add">
+            <span className="en-only">Quick Add</span>
+            <span className="ar-only">أضف للحقيبة</span>
+            <span className="p-quick-add-plus">+</span>
+          </div>
+        </div>
+        <div className="p-info">
+          <div className="p-name en-only">{card.name}</div>
+          <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{card.nameAr}</div>
+          <div className="p-price-row">
+            <span className="p-price">{card.price}</span>
+            <div className="p-stars"><span className="p-star">{card.stars}</span></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="carousel-section">
+      {/* Header */}
       <div className="carousel-header reveal-target">
         <div>
           <div className="section-label en-only">{labelEn}</div>
@@ -307,7 +370,8 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
           <p className="section-body-ar en-only" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{descEn}</p>
           <p className="section-body-ar ar-only">{descAr}</p>
         </div>
-        <div className="carousel-nav">
+        {/* Arrows — desktop only */}
+        <div className="carousel-nav carousel-nav-desktop">
           <button className="carousel-arrow" onClick={() => slide(-1)}>
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
@@ -317,8 +381,9 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
         </div>
       </div>
 
+      {/* Desktop / tablet horizontal carousel */}
       <div
-        className="carousel-track-wrap"
+        className="carousel-track-wrap carousel-desktop-track"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -335,67 +400,26 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
           style={{ transform: `translateX(-${offset}px)`, transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)' }}
         >
           {useReal
-            ? products!.map(p => {
-                const img = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : null
-                const badge = p.badge ? BADGE_LABEL[p.badge] : null
-                const bg = COLLECTION_BG[p.collection] ?? 'c1'
-                return (
-                  <Link key={p._id} href={`/product/${p.slug.current}`} className="p-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div className="p-card-img">
-                      <div className={`p-card-img-bg ${bg}`}></div>
-                      {img && (
-                        <Image
-                          src={img}
-                          alt={p.name_en}
-                          fill
-                          sizes="280px"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      )}
-                      {badge && (
-                        <span className={`p-badge${badge.isNew ? ' new' : ''}`}>{badge.label}</span>
-                      )}
-                      <div className="p-quick-add" onClick={(e) => handleProductAdd(e, p)}>
-                        <span className="en-only">Quick Add</span>
-                        <span className="ar-only">أضف للحقيبة</span>
-                        <span className="p-quick-add-plus">+</span>
-                      </div>
-                    </div>
-                    <div className="p-info">
-                      <div className="p-name en-only">{p.name_en}</div>
-                      <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{p.name_ar}</div>
-                      <div className="p-price-row">
-                        <span className="p-price">{formatPrice(p.price)}</span>
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })
-            : cards!.map(card => (
-              <div key={card.name} className="p-card" onClick={() => quickAdd(card.name, card.nameAr)}>
-                <div className="p-card-img">
-                  <div className={`p-card-img-bg ${card.bg}`}></div>
-                  <card.Svg />
-                  {card.badge && (
-                    <span className={`p-badge${card.badgeNew ? ' new' : ''}`}>{card.badge}</span>
-                  )}
-                  <div className="p-quick-add">
-                    <span className="en-only">Quick Add</span>
-                    <span className="ar-only">أضف للحقيبة</span>
-                    <span className="p-quick-add-plus">+</span>
-                  </div>
-                </div>
-                <div className="p-info">
-                  <div className="p-name en-only">{card.name}</div>
-                  <div className="p-name ar-only" style={{ fontFamily: "'Amiri', serif" }}>{card.nameAr}</div>
-                  <div className="p-price-row">
-                    <span className="p-price">{card.price}</span>
-                    <div className="p-stars"><span className="p-star">{card.stars}</span></div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            ? products!.map(renderRealCard)
+            : (cards ?? []).map(renderDemoCard)
+          }
         </div>
+      </div>
+
+      {/* Mobile 2-col grid (hidden on desktop via CSS) */}
+      <div className="carousel-mobile-wrap">
+        <div className="carousel-mobile-grid">
+          {useReal
+            ? products!.slice(0, 6).map(renderRealCard)
+            : (cards ?? []).slice(0, 6).map(renderDemoCard)
+          }
+        </div>
+        {viewAllHref && (
+          <Link href={viewAllHref} className="carousel-view-all">
+            <span className="en-only">View All →</span>
+            <span className="ar-only">← عرض الكل</span>
+          </Link>
+        )}
       </div>
     </div>
   )
@@ -413,6 +437,7 @@ export function LipCarousel({ products }: { products?: Product[] }) {
       descAr="أحمر الشفاه الذي يروي قصتك"
       cards={LIP_CARDS}
       products={products}
+      viewAllHref="/shop?collection=lip"
     />
   )
 }
@@ -429,6 +454,7 @@ export function EyeCarousel({ products }: { products?: Product[] }) {
       descAr="عيون تحكي ألف قصة"
       cards={EYE_CARDS}
       products={products}
+      viewAllHref="/shop?collection=eye"
     />
   )
 }
