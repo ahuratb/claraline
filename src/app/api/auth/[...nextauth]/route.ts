@@ -1,13 +1,16 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
-import clientPromise, { getDb } from '@/lib/mongodb'
+import GoogleProvider from 'next-auth/providers/google'
+import { getDb } from '@/lib/mongodb'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise) as NextAuthOptions['adapter'],
-
   providers: [
+    GoogleProvider({
+      clientId:     process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -28,6 +31,7 @@ export const authOptions: NextAuthOptions = {
           id:    user._id.toString(),
           email: user.email as string,
           name:  user.name  as string,
+          image: (user.image as string | undefined) ?? null,
         }
       },
     }),
@@ -39,10 +43,58 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id
+    async signIn({ user, account }) {
+      if (account?.provider !== 'google') return true
+
+      try {
+        const db       = await getDb()
+        const existing = await db.collection('users').findOne({ email: user.email })
+
+        if (existing) {
+          await db.collection('users').updateOne(
+            { email: user.email },
+            { $set: { lastLogin: new Date(), image: user.image } },
+          )
+          user.id = existing._id.toString()
+        } else {
+          const result = await db.collection('users').insertOne({
+            name:          user.name,
+            email:         user.email,
+            image:         user.image,
+            provider:      'google',
+            googleId:      account.providerAccountId,
+            emailVerified: true,
+            createdAt:     new Date(),
+            lastLogin:     new Date(),
+          })
+          user.id = result.insertedId.toString()
+        }
+        return true
+      } catch (err) {
+        console.error('[NextAuth] Google signIn error:', err)
+        return false
+      }
+    },
+
+    async jwt({ token, user, account }) {
+      if (user) {
+        if (account?.provider === 'google') {
+          // For Google sign-ins, user.id was set in the signIn callback above.
+          // If it's missing (e.g. first-time race), look it up.
+          if (user.id) {
+            token.id = user.id
+          } else {
+            const db     = await getDb()
+            const dbUser = await db.collection('users').findOne({ email: user.email })
+            token.id     = dbUser?._id.toString() ?? ''
+          }
+        } else {
+          token.id = user.id
+        }
+      }
       return token
     },
+
     async session({ session, token }) {
       if (token?.id) session.user.id = token.id as string
       return session
