@@ -14,8 +14,7 @@ const EXTRA_LINKS = [
 
 export default function MobileTopBar() {
   const [lang, setLang]   = useState<'EN' | 'AR'>('EN')
-  const [collectionsOpen, setCollectionsOpen] = useState(true)   // outer accordion (Collections)
-  const [expanded, setExpanded] = useState<string | null>('lip') // which inner category is open
+  const [expanded, setExpanded] = useState<string | null>('lip') // which category is open
   const drawerRef = useRef<HTMLDivElement>(null)
 
   const isMenuOpen = useCartStore(s => s.isMenuOpen)
@@ -194,86 +193,69 @@ export default function MobileTopBar() {
         {/* Body */}
         <div className="drawer-body megamenu-body" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
 
-          {/* COLLECTIONS — top-level accordion that nests the categories */}
-          <div className={`megamenu-top-item${collectionsOpen ? ' open' : ''}`}>
-            <button
-              type="button"
-              className="megamenu-top-head"
-              onClick={() => setCollectionsOpen(o => !o)}
-              aria-expanded={collectionsOpen}
-            >
-              <span className="megamenu-cat-toggle" aria-hidden />
-              <span className="megamenu-top-name en-only">Collections</span>
-              <span className="megamenu-top-name ar-only">المجموعات</span>
-              <span className="megamenu-top-ar en-only">— المجموعات</span>
-              <span className="megamenu-top-ar ar-only">— Collections</span>
-            </button>
-            <div className="megamenu-top-body">
-              <div className="megamenu-top-body-inner">
-                <ul className="megamenu-cats">
-                  {MENU_CATEGORIES.map(cat => {
-                    const open = expanded === cat.slug
-                    return (
-                      <li key={cat.slug} className={`megamenu-cat${open ? ' open' : ''}`}>
-                        <button
-                          type="button"
-                          className="megamenu-cat-head"
-                          onClick={() => toggleCategory(cat.slug)}
-                          aria-expanded={open}
-                        >
-                          <span className="megamenu-cat-toggle" aria-hidden />
-                          <span className="megamenu-cat-name en-only">{cat.name_en}</span>
-                          <span className="megamenu-cat-name ar-only">{cat.name_ar}</span>
-                          <span className="megamenu-cat-ar en-only">{cat.name_ar}</span>
-                          <span className="megamenu-cat-ar ar-only">{cat.name_en}</span>
-                          <span className="megamenu-cat-count">{cat.subcategories.length}</span>
-                        </button>
-                        <div className="megamenu-cat-body">
-                          <div className="megamenu-cat-body-inner">
-                            {cat.subcategories.length === 0 ? (
-                              <Link
-                                href={`/shop?collection=${cat.slug}`}
-                                className="megamenu-sub"
-                                onClick={closeMenu}
-                              >
-                                <span className="megamenu-sub-diamond">◇</span>
-                                <span className="en-only">View all</span>
-                                <span className="ar-only">عرض الكل</span>
-                              </Link>
-                            ) : (
-                              cat.subcategories.map(sub => (
-                                <Link
-                                  key={sub.slug}
-                                  href={`/shop?collection=${cat.slug}&type=${sub.slug}`}
-                                  className="megamenu-sub"
-                                  onClick={closeMenu}
-                                >
-                                  <span className="megamenu-sub-diamond">◇</span>
-                                  <span className="en-only">{sub.name_en}</span>
-                                  <span className="ar-only">{sub.name_ar}</span>
-                                </Link>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
+          {/* COLLECTIONS label + category list — always expanded */}
+          <p className="megamenu-collections-label">
+            <span className="en-only">Collections — المجموعات</span>
+            <span className="ar-only">المجموعات — Collections</span>
+          </p>
 
-                {/* "View All Products →" */}
-                <Link
-                  href="/shop"
-                  className="megamenu-viewall"
-                  onClick={closeMenu}
-                >
-                  <span className="en-only">View All Products</span>
-                  <span className="ar-only">عرض جميع المنتجات</span>
-                  <span aria-hidden>→</span>
-                </Link>
-              </div>
-            </div>
-          </div>
+          <ul className="megamenu-cats">
+            {MENU_CATEGORIES.map(cat => {
+              const open = expanded === cat.slug
+              return (
+                <li key={cat.slug} className={`megamenu-cat${open ? ' open' : ''}`}>
+                  <button
+                    type="button"
+                    className="megamenu-cat-head"
+                    onClick={() => toggleCategory(cat.slug)}
+                    aria-expanded={open}
+                  >
+                    <span className="megamenu-cat-toggle" aria-hidden />
+                    <span className="megamenu-cat-name en-only">{cat.name_en}</span>
+                    <span className="megamenu-cat-name ar-only">{cat.name_ar}</span>
+                    <span className="megamenu-cat-ar en-only">{cat.name_ar}</span>
+                    <span className="megamenu-cat-ar ar-only">{cat.name_en}</span>
+                    <span className="megamenu-cat-count">{cat.subcategories.length}</span>
+                  </button>
+                  <div className="megamenu-cat-body">
+                    <div className="megamenu-cat-body-inner">
+                      {cat.subcategories.length === 0 ? (
+                        <Link
+                          href={`/shop?collection=${cat.slug}`}
+                          className="megamenu-sub"
+                          onClick={closeMenu}
+                        >
+                          <span className="megamenu-sub-diamond">◇</span>
+                          <span className="en-only">View all</span>
+                          <span className="ar-only">عرض الكل</span>
+                        </Link>
+                      ) : (
+                        cat.subcategories.map(sub => (
+                          <Link
+                            key={sub.slug}
+                            href={`/shop?collection=${cat.slug}&type=${sub.slug}`}
+                            className="megamenu-sub"
+                            onClick={closeMenu}
+                          >
+                            <span className="megamenu-sub-diamond">◇</span>
+                            <span className="en-only">{sub.name_en}</span>
+                            <span className="ar-only">{sub.name_ar}</span>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* View All Products */}
+          <Link href="/shop" className="megamenu-viewall" onClick={closeMenu}>
+            <span className="en-only">View All Products</span>
+            <span className="ar-only">عرض جميع المنتجات</span>
+            <span className="megamenu-viewall-arrow" aria-hidden>→</span>
+          </Link>
 
           <div className="megamenu-divider" />
 

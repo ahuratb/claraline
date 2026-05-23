@@ -1205,124 +1205,167 @@ html.lang-ar .ls-image { right: auto; left: 0; }
    MEGA MENU (mobile slide-in)
 ═══════════════════════════════════════════════════ */
 .megamenu-body { padding: 0; }
+
+/* Collections section label */
+.megamenu-collections-label {
+  margin: 0;
+  padding: 20px 24px 12px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.6);
+}
+
+/* Category rows */
 .megamenu-cats { list-style: none; padding: 0; margin: 0; }
-.megamenu-cat { border-bottom: 0.5px solid rgba(201,169,110,0.12); }
+.megamenu-cat { border-bottom: 0.5px solid rgba(201,169,110,0.08); }
 .megamenu-cat-head {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 24px;
+  gap: 12px;
+  padding: 12px 24px;
   background: transparent;
   border: none;
   cursor: pointer;
   text-align: left;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* +/× toggle icon — rotates 45deg when open */
 .megamenu-cat-toggle {
   position: relative;
-  width: 14px; height: 14px;
+  width: 12px; height: 12px;
   flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .megamenu-cat-toggle::before,
 .megamenu-cat-toggle::after {
   content: '';
   position: absolute;
-  background: var(--champagne);
-  transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  background: rgba(201,169,110,0.7);
+  transition: opacity 0.3s;
 }
 .megamenu-cat-toggle::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
 .megamenu-cat-toggle::after  { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
-.megamenu-cat.open .megamenu-cat-toggle::after { transform: translateX(-50%) scaleY(0); }
+.megamenu-cat.open .megamenu-cat-toggle { transform: rotate(45deg); }
+
 .megamenu-cat-name {
-  font-size: 18px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
   font-weight: 300;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--ivory);
 }
 .megamenu-cat-ar {
-  font-size: 13px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 10px;
   color: var(--muted);
-  margin-left: 6px;
+  margin-left: 8px;
 }
 .megamenu-cat-count {
   margin-left: auto;
-  font-size: 11px;
-  color: var(--champagne);
+  font-family: 'Cairo', sans-serif;
+  font-size: 10px;
+  color: rgba(201,169,110,0.6);
   letter-spacing: 0.05em;
 }
+
+/* Accordion body */
 .megamenu-cat-body {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
-  background: rgba(201,169,110,0.025);
+  background: rgba(201,169,110,0.02);
 }
 .megamenu-cat.open .megamenu-cat-body { grid-template-rows: 1fr; }
-.megamenu-cat-body-inner { overflow: hidden; padding: 0 24px 12px 60px; }
+.megamenu-cat-body-inner { overflow: hidden; padding: 0 24px 10px 50px; }
+
+/* Sub-items */
 .megamenu-sub {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  color: var(--ivory);
+  gap: 10px;
+  padding: 10px 0;
+  color: rgba(250,245,238,0.65);
   text-decoration: none;
-  font-size: 13px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 10px;
   font-weight: 300;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   transition: color 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
-.megamenu-sub:hover,
-.megamenu-sub:active { color: var(--champagne); }
-.megamenu-sub-diamond { color: var(--champagne); font-size: 11px; }
+.megamenu-sub:hover, .megamenu-sub:active { color: var(--champagne); }
+.megamenu-sub-diamond { color: rgba(201,169,110,0.5); font-size: 9px; }
 
-.megamenu-divider { height: 0.5px; background: rgba(201,169,110,0.12); margin: 12px 24px; }
-
-.megamenu-extras { list-style: none; padding: 0; margin: 0; }
-.megamenu-extras li { border-bottom: 0.5px solid rgba(201,169,110,0.08); }
-.megamenu-extras li:last-child { border-bottom: none; }
-.megamenu-extra-link {
-  display: block;
-  padding: 16px 24px;
-  color: var(--ivory);
-  font-size: 16px;
-  font-weight: 300;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  transition: color 0.2s, background 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-.megamenu-extra-link:hover,
-.megamenu-extra-link:active { color: var(--champagne); background: rgba(201,169,110,0.04); }
-
-.megamenu-toggles {
+/* View All Products link */
+.megamenu-viewall {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   padding: 14px 24px;
-}
-.megamenu-toggle-label {
-  font-size: 10px;
-  letter-spacing: 0.3em;
+  font-family: 'Cairo', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--champagne);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s;
 }
+.megamenu-viewall:hover, .megamenu-viewall:active { opacity: 0.7; }
+.megamenu-viewall-arrow {
+  font-size: 11px;
+  transition: transform 0.3s;
+  display: inline-block;
+}
+.megamenu-viewall:hover .megamenu-viewall-arrow { transform: translateX(4px); }
 
+/* Divider */
+.megamenu-divider { height: 0.5px; background: rgba(201,169,110,0.1); margin: 20px 24px; }
+
+/* Static links — Ritual, About, Contact */
+.megamenu-extras { list-style: none; padding: 0; margin: 0; }
+.megamenu-extras li { border-bottom: none; }
+.megamenu-extra-link {
+  display: block;
+  padding: 10px 24px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(250,245,238,0.7);
+  text-decoration: none;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.megamenu-extra-link:hover, .megamenu-extra-link:active { color: var(--champagne); }
+
+/* Trust badges */
 .megamenu-trust {
   padding: 8px 24px 32px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .megamenu-trust-item {
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.06em;
+  font-family: 'Cairo', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.5);
   display: inline-flex;
   align-items: center;
   gap: 10px;
 }
-.megamenu-trust-mark { color: var(--champagne); }
+.megamenu-trust-mark { color: var(--champagne); font-size: 8px; }
 
 /* ═══════════════════════════════════════════════════
    BOTTOM NAV — hide when any drawer is open
