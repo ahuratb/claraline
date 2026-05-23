@@ -1,22 +1,38 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
 import { formatPrice, generateOrderId } from '@/lib/utils'
 import { Customer } from '@/types'
 import toast from 'react-hot-toast'
 
-const KUWAIT_CITIES = ['Kuwait City', 'Salmiya', 'Hawalli', 'Jabriya', 'Shuwaikh', 'Farwaniya', 'Fahaheel', 'Ahmadi', 'Sabah Al-Salem', 'Abu Halifa']
+const KUWAIT_CITIES = [
+  { en: 'Kuwait City',    ar: 'مدينة الكويت' },
+  { en: 'Salmiya',        ar: 'السالمية'     },
+  { en: 'Hawalli',        ar: 'حولي'         },
+  { en: 'Jabriya',        ar: 'الجابرية'     },
+  { en: 'Shuwaikh',       ar: 'الشويخ'       },
+  { en: 'Farwaniya',      ar: 'الفروانية'    },
+  { en: 'Fahaheel',       ar: 'الفحاحيل'     },
+  { en: 'Ahmadi',         ar: 'الأحمدي'      },
+  { en: 'Sabah Al-Salem', ar: 'صباح السالم'  },
+  { en: 'Abu Halifa',     ar: 'أبو حليفة'    },
+]
 
 export default function CheckoutForm() {
   const router = useRouter()
   const { items, total, clearCart } = useCartStore()
   const cartTotal = total()
+  const [isAr, setIsAr] = useState(false)
 
   const [customer, setCustomer] = useState<Customer>({
     name: '', email: '', phone: '+965 ', address: '', city: 'Kuwait City', country: 'Kuwait',
   })
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setIsAr(document.documentElement.classList.contains('lang-ar'))
+  }, [])
 
   function update(field: keyof Customer, value: string) {
     setCustomer(prev => ({ ...prev, [field]: value }))
@@ -30,14 +46,12 @@ export default function CheckoutForm() {
     try {
       const orderId = generateOrderId()
 
-      // Save order
       await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: orderId, items, total: cartTotal, customer, status: 'pending' }),
       })
 
-      // Initiate payment
       const res = await fetch('/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,129 +76,209 @@ export default function CheckoutForm() {
     }
   }
 
-  const inputClass = "w-full bg-[var(--deep)] border border-[rgba(201,169,110,0.2)] text-[var(--ivory)] px-4 py-3 text-sm focus:outline-none focus:border-[var(--champagne)] transition-colors placeholder-[var(--muted)]"
+  function PayLabel() {
+    if (loading) return (
+      <>
+        <span className="en-only">Redirecting…</span>
+        <span className="ar-only">جارٍ التوجيه…</span>
+      </>
+    )
+    return (
+      <>
+        <span className="en-only">Pay Now · {formatPrice(cartTotal)}</span>
+        <span className="ar-only">ادفع الآن · {formatPrice(cartTotal)}</span>
+      </>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-[var(--obsidian)] pt-32 pb-20 px-14">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+    <main className="co-page">
+      <div className="co-grid">
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <p className="text-[var(--champagne)] text-[9px] tracking-[0.5em] uppercase mb-2 opacity-70" style={{ fontFamily: 'Cairo, sans-serif' }}>Delivery Details</p>
-            <h1 className="text-[var(--ivory)] text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Checkout</h1>
+        {/* ── Form column ── */}
+        <div className="co-form-col">
+          <div className="co-header">
+            <span className="co-eyebrow en-only">Delivery Details</span>
+            <span className="co-eyebrow ar-only">تفاصيل التوصيل</span>
+            <h1 className="co-title">
+              <span className="en-only">Checkout</span>
+              <span className="ar-only">الدفع</span>
+            </h1>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>Full Name *</label>
+          <form id="co-checkout-form" className="co-form" onSubmit={handleSubmit}>
+
+            <div className="co-row">
+              <div className="co-field">
+                <label className="co-label">
+                  <span className="en-only">Full Name *</span>
+                  <span className="ar-only">الاسم الكامل *</span>
+                </label>
+                <input
+                  className="co-input"
+                  value={customer.name}
+                  onChange={e => update('name', e.target.value)}
+                  required
+                  placeholder={isAr ? 'ليلى الأحمد' : 'Layla Al-Ahmad'}
+                />
+              </div>
+              <div className="co-field">
+                <label className="co-label">
+                  <span className="en-only">Email *</span>
+                  <span className="ar-only">البريد الإلكتروني *</span>
+                </label>
+                <input
+                  className="co-input"
+                  type="email"
+                  value={customer.email}
+                  onChange={e => update('email', e.target.value)}
+                  required
+                  placeholder="layla@email.com"
+                />
+              </div>
+            </div>
+
+            <div className="co-field">
+              <label className="co-label">
+                <span className="en-only">Phone (Kuwait) *</span>
+                <span className="ar-only">رقم الهاتف (الكويت) *</span>
+              </label>
               <input
-                className={inputClass}
-                style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                value={customer.name}
-                onChange={e => update('name', e.target.value)}
-                required placeholder="Layla Al-Ahmad"
+                className="co-input co-input-phone"
+                value={customer.phone}
+                onChange={e => update('phone', e.target.value)}
+                required
+                placeholder="+965 9999 9999"
+                dir="ltr"
               />
             </div>
-            <div>
-              <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>Email *</label>
+
+            <div className="co-field">
+              <label className="co-label">
+                <span className="en-only">Delivery Address *</span>
+                <span className="ar-only">عنوان التوصيل *</span>
+              </label>
               <input
-                className={inputClass}
-                style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                type="email" value={customer.email}
-                onChange={e => update('email', e.target.value)}
-                required placeholder="layla@email.com"
+                className="co-input"
+                value={customer.address}
+                onChange={e => update('address', e.target.value)}
+                required
+                placeholder={isAr ? 'قطعة ٥، شارع ١٢، منزل ٣٤' : 'Block 5, Street 12, House 34'}
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>Phone (Kuwait) *</label>
-            <input
-              className={inputClass}
-              style={{ fontFamily: 'Cairo, sans-serif' }}
-              value={customer.phone}
-              onChange={e => update('phone', e.target.value)}
-              required placeholder="+965 9999 9999"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>Delivery Address *</label>
-            <input
-              className={inputClass}
-              style={{ fontFamily: 'Cormorant Garamond, serif' }}
-              value={customer.address}
-              onChange={e => update('address', e.target.value)}
-              required placeholder="Block 5, Street 12, House 34"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>City *</label>
-              <select
-                className={`${inputClass} cursor-pointer`}
-                style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                value={customer.city}
-                onChange={e => update('city', e.target.value)}
-              >
-                {KUWAIT_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+            <div className="co-row">
+              <div className="co-field">
+                <label className="co-label">
+                  <span className="en-only">City *</span>
+                  <span className="ar-only">المدينة *</span>
+                </label>
+                <select
+                  className="co-input co-select"
+                  value={customer.city}
+                  onChange={e => update('city', e.target.value)}
+                >
+                  {KUWAIT_CITIES.map(c => (
+                    <option key={c.en} value={c.en}>{isAr ? c.ar : c.en}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="co-field">
+                <label className="co-label">
+                  <span className="en-only">Country</span>
+                  <span className="ar-only">الدولة</span>
+                </label>
+                <input
+                  className="co-input"
+                  value={isAr ? 'الكويت' : 'Kuwait'}
+                  readOnly
+                  style={{ opacity: 0.6 }}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-[var(--muted)] text-[10px] tracking-widest uppercase mb-2" style={{ fontFamily: 'Cairo, sans-serif' }}>Country</label>
-              <input className={inputClass} value="Kuwait" readOnly style={{ fontFamily: 'Cormorant Garamond, serif', opacity: 0.6 }} />
-            </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading || items.length === 0}
-            className="w-full py-5 bg-[var(--champagne)] text-[var(--obsidian)] text-[10px] tracking-[0.4em] uppercase font-semibold hover:bg-[var(--ivory)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-            style={{ fontFamily: 'Cairo, sans-serif' }}
-          >
-            {loading ? 'Redirecting to payment...' : `Pay Now · ${formatPrice(cartTotal)}`}
-          </button>
+          </form>
+        </div>
 
-          <p className="text-[var(--muted)] text-xs text-center tracking-wider" style={{ fontFamily: 'Cairo, sans-serif' }}>
-            Secured by MyFatoorah · KNET · Tabby · Visa · Mastercard
+        {/* ── Order Summary ── */}
+        <aside className="co-summary">
+          <p className="co-summary-title">
+            <span className="en-only">Order Summary</span>
+            <span className="ar-only">ملخص الطلب</span>
           </p>
-        </form>
 
-        {/* Order Summary */}
-        <aside className="space-y-6">
-          <h2 className="text-[var(--champagne)] text-[9px] tracking-[0.5em] uppercase opacity-70" style={{ fontFamily: 'Cairo, sans-serif' }}>Order Summary</h2>
-
-          <div className="space-y-4">
+          <div className="co-items">
             {items.map(item => (
-              <div key={`${item.productId}-${item.shade}`} className="flex justify-between items-start gap-3">
-                <div className="min-w-0">
-                  <p className="text-[var(--ivory)] text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{item.name_en}</p>
-                  {item.shade && <p className="text-[var(--muted)] text-[10px] tracking-widest">{item.shade}</p>}
-                  <p className="text-[var(--muted)] text-[10px]">× {item.quantity}</p>
+              <div key={`${item.productId}-${item.shade ?? ''}`} className="co-item">
+                <div className="co-item-info">
+                  <p className="co-item-name">
+                    <span className="en-only">{item.name_en}</span>
+                    <span className="ar-only">{item.name_ar}</span>
+                  </p>
+                  {item.shade && <p className="co-item-shade">{item.shade}</p>}
+                  <p className="co-item-qty">× {item.quantity}</p>
                 </div>
-                <p className="text-[var(--ivory)] text-sm flex-shrink-0">{formatPrice(item.price * item.quantity)}</p>
+                <p className="co-item-price">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-[rgba(201,169,110,0.15)] pt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-[var(--muted)]" style={{ fontFamily: 'Cairo, sans-serif' }}>Subtotal</span>
-              <span className="text-[var(--ivory)]">{formatPrice(cartTotal)}</span>
+          <div className="co-totals">
+            <div className="co-totals-row">
+              <span className="co-totals-label">
+                <span className="en-only">Subtotal</span>
+                <span className="ar-only">المجموع الفرعي</span>
+              </span>
+              <span className="co-totals-value">{formatPrice(cartTotal)}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[var(--muted)]" style={{ fontFamily: 'Cairo, sans-serif' }}>Delivery</span>
-              <span className="text-[var(--champagne)] text-xs">Free over KWD 20</span>
+            <div className="co-totals-row">
+              <span className="co-totals-label">
+                <span className="en-only">Delivery</span>
+                <span className="ar-only">التوصيل</span>
+              </span>
+              <span className="co-totals-delivery">
+                <span className="en-only">Free over KWD 20</span>
+                <span className="ar-only">مجاني فوق ٢٠ د.ك</span>
+              </span>
             </div>
-            <div className="flex justify-between text-lg font-light border-t border-[rgba(201,169,110,0.15)] pt-3 mt-2">
-              <span className="text-[var(--ivory)]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Total</span>
-              <span className="text-[var(--champagne)]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{formatPrice(cartTotal)}</span>
+            <div className="co-totals-row co-totals-grand">
+              <span className="co-totals-grand-label">
+                <span className="en-only">Total</span>
+                <span className="ar-only">الإجمالي</span>
+              </span>
+              <span className="co-totals-grand-value">{formatPrice(cartTotal)}</span>
             </div>
           </div>
+
+          {/* Pay button — visible on desktop only */}
+          <button
+            type="submit"
+            form="co-checkout-form"
+            className="co-pay-btn co-pay-in-summary"
+            disabled={loading || items.length === 0}
+          >
+            <PayLabel />
+          </button>
+
+          <p className="co-secure">
+            <span className="en-only">Secured by MyFatoorah · KNET · Tabby · Visa · Mastercard</span>
+            <span className="ar-only">مؤمّن بواسطة MyFatoorah · كي نت · تابي · فيزا · ماستركارد</span>
+          </p>
         </aside>
+
       </div>
-    </div>
+
+      {/* ── Fixed pay button — mobile & tablet only ── */}
+      <div className="co-pay-fixed">
+        <button
+          type="submit"
+          form="co-checkout-form"
+          className="co-pay-btn"
+          disabled={loading || items.length === 0}
+        >
+          <PayLabel />
+        </button>
+      </div>
+    </main>
   )
 }
