@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCartStore } from '@/lib/store'
 import MegaMenu from '@/components/MegaMenu'
 import KuwaitFlag from '@/components/KuwaitFlag'
+import USAFlag from '@/components/USAFlag'
 
 type Theme = 'dark' | 'light'
 
@@ -158,7 +159,7 @@ export default function Nav() {
             className="nav-lang-pill"
             aria-label={lang === 'EN' ? 'Switch to Arabic' : 'Switch to English'}
           >
-            {lang === 'EN' && <KuwaitFlag width={20} height={14} />}
+            {lang === 'EN' ? <KuwaitFlag width={20} height={14} /> : <USAFlag width={20} height={14} />}
             <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
 

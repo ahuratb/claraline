@@ -17,27 +17,26 @@ interface Filters {
 }
 
 const COLLECTIONS: { value: Collection; label: string; labelAr: string }[] = [
-  { value: 'all',  label: 'All Products', labelAr: 'الكل'      },
-  { value: 'lip',  label: 'Lip',           labelAr: 'الشفاه'    },
-  { value: 'eye',  label: 'Eye',           labelAr: 'العيون'    },
-  { value: 'face', label: 'Face',          labelAr: 'الوجه'     },
-  { value: 'gift', label: 'Gift Sets',     labelAr: 'هدايا'     },
+  { value: 'all',  label: 'All Products', labelAr: 'الكل'   },
+  { value: 'lip',  label: 'Lip',          labelAr: 'الشفاه' },
+  { value: 'eye',  label: 'Eye',          labelAr: 'العيون' },
+  { value: 'face', label: 'Face',         labelAr: 'الوجه'  },
+  { value: 'gift', label: 'Gift Sets',    labelAr: 'هدايا'  },
 ]
 
-const BADGE_LABELS: Record<BadgeFilter, string> = {
-  new:        'New Arrivals',
-  bestseller: 'Best Sellers',
-  limited:    'Limited Edition',
+const BADGE_LABELS: Record<BadgeFilter, { en: string; ar: string }> = {
+  new:        { en: 'New Arrivals',     ar: 'وصل حديثاً'    },
+  bestseller: { en: 'Best Sellers',    ar: 'الأكثر مبيعاً' },
+  limited:    { en: 'Limited Edition', ar: 'إصدار محدود'   },
 }
 
-const SORT_OPTIONS: { value: Sort; label: string }[] = [
-  { value: 'featured',   label: 'Featured'          },
-  { value: 'price-asc',  label: 'Price · Low to High' },
-  { value: 'price-desc', label: 'Price · High to Low' },
-  { value: 'new',        label: 'Newest First'        },
+const SORT_OPTIONS: { value: Sort; en: string; ar: string }[] = [
+  { value: 'featured',   en: 'Featured',            ar: 'مميز'           },
+  { value: 'price-asc',  en: 'Price · Low to High', ar: 'السعر · الأدنى' },
+  { value: 'price-desc', en: 'Price · High to Low', ar: 'السعر · الأعلى' },
+  { value: 'new',        en: 'Newest First',         ar: 'الأحدث أولاً'  },
 ]
 
-// ── styled atoms ──────────────────────────────────────────────────────────────
 const LABEL_STYLE: React.CSSProperties = {
   fontSize:      '9px',
   letterSpacing: '0.3em',
@@ -60,12 +59,19 @@ export default function ShopClient({ products }: { products: Product[] }) {
   const [search,     setSearch]     = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [gridKey,    setGridKey]    = useState(0)
+  const [isAr,       setIsAr]       = useState(false)
   const prevKey = useRef('')
 
-  // Keep maxPrice in sync with actual product range
+  useEffect(() => {
+    const check = () => setIsAr(document.documentElement.classList.contains('lang-ar'))
+    check()
+    const obs = new MutationObserver(check)
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+
   useEffect(() => { setFilters(f => ({ ...f, maxPrice: priceMax })) }, [priceMax])
 
-  // Re-trigger card reveals on discrete filter changes (not on price slider drag)
   const discreteKey = `${filters.collection}|${filters.badges.join(',')}|${sort}|${search.trim()}|${filters.shadesOnly}|${filters.inStockOnly}`
   useEffect(() => {
     if (prevKey.current && prevKey.current !== discreteKey) setGridKey(k => k + 1)
@@ -121,13 +127,16 @@ export default function ShopClient({ products }: { products: Product[] }) {
     }))
   }
 
-  // ── Sidebar (used by desktop + mobile drawer) ─────────────────────────────
+  // ── Sidebar ───────────────────────────────────────────────────────────────
   const Sidebar = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
 
       {/* Collections */}
       <div>
-        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>Categories</p>
+        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>
+          <span className="en-only">Categories</span>
+          <span className="ar-only">الفئات</span>
+        </p>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {COLLECTIONS.map(c => {
             const active = filters.collection === c.value
@@ -155,7 +164,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                   letterSpacing: '0.02em',
                   transition:  'all 0.3s',
                 }}>
-                  {c.label}
+                  <span className="en-only">{c.label}</span>
+                  <span className="ar-only">{c.labelAr}</span>
                 </span>
                 <span style={{
                   fontSize:    '10px',
@@ -173,9 +183,12 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
       {/* Tags */}
       <div>
-        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>Tags</p>
+        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>
+          <span className="en-only">Tags</span>
+          <span className="ar-only">التصنيفات</span>
+        </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {(Object.entries(BADGE_LABELS) as [BadgeFilter, string][]).map(([value, label]) => {
+          {(Object.entries(BADGE_LABELS) as [BadgeFilter, { en: string; ar: string }][]).map(([value, label]) => {
             const on = filters.badges.includes(value)
             return (
               <label
@@ -183,16 +196,14 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 onClick={() => toggleBadge(value)}
                 style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }}
               >
-                <span
-                  style={{
-                    width: '12px', height: '12px',
-                    flexShrink: 0,
-                    border: `0.5px solid ${on ? 'var(--champagne)' : 'rgba(201,169,110,0.3)'}`,
-                    background: on ? 'var(--champagne)' : 'transparent',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.25s',
-                  }}
-                >
+                <span style={{
+                  width: '12px', height: '12px',
+                  flexShrink: 0,
+                  border: `0.5px solid ${on ? 'var(--champagne)' : 'rgba(201,169,110,0.3)'}`,
+                  background: on ? 'var(--champagne)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.25s',
+                }}>
                   {on && (
                     <span style={{ color: 'var(--obsidian)', fontSize: '8px', lineHeight: 1, fontWeight: 700 }}>✓</span>
                   )}
@@ -204,7 +215,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                   fontFamily:  'Cairo, sans-serif',
                   transition:  'color 0.3s',
                 }}>
-                  {label}
+                  <span className="en-only">{label.en}</span>
+                  <span className="ar-only">{label.ar}</span>
                 </span>
               </label>
             )
@@ -214,7 +226,10 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
       {/* Price */}
       <div>
-        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>Price Range</p>
+        <p style={{ ...LABEL_STYLE, marginBottom: '18px' }}>
+          <span className="en-only">Price Range</span>
+          <span className="ar-only">نطاق السعر</span>
+        </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
           <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'Cairo, sans-serif', letterSpacing: '0.1em' }}>
             KWD 0.000
@@ -259,9 +274,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
       {/* Extras */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {([
-          { key: 'shadesOnly'  as const, label: 'Has Color Shades' },
-          { key: 'inStockOnly' as const, label: 'In Stock Only'    },
-        ] as const).map(({ key, label }) => {
+          { key: 'shadesOnly'  as const, en: 'Has Color Shades', ar: 'لديها ظلال ألوان' },
+          { key: 'inStockOnly' as const, en: 'In Stock Only',    ar: 'المتوفر فقط'      },
+        ]).map(({ key, en, ar }) => {
           const on = filters[key]
           return (
             <label
@@ -286,7 +301,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 fontFamily:  'Cairo, sans-serif',
                 transition:  'color 0.3s',
               }}>
-                {label}
+                <span className="en-only">{en}</span>
+                <span className="ar-only">{ar}</span>
               </span>
             </label>
           )
@@ -312,7 +328,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(201,169,110,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--champagne)' }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,169,110,0.25)' }}
         >
-          Clear All · {activeCount}
+          <span className="en-only">Clear All · {activeCount}</span>
+          <span className="ar-only">مسح الكل · {activeCount}</span>
         </button>
       )}
     </div>
@@ -323,7 +340,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
     <div style={{ background: 'var(--obsidian)', minHeight: '100vh', position: 'relative' }}>
 
       {/* ════ Header ════════════════════════════════════════════════════════ */}
-      <section style={{ padding: '160px 56px 0', position: 'relative' }}>
+      <section style={{ padding: '160px 56px 0', position: 'relative', textAlign: 'center' }}>
         <span
           style={{
             fontSize:    '9px',
@@ -336,7 +353,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
             display:     'block',
           }}
         >
-          Kuwait Luxury Beauty · Est. 2024
+          <span className="en-only">Kuwait Luxury Beauty · Est. 2024</span>
+          <span className="ar-only">الجمال الفاخر الكويتي · منذ ٢٠٢٤</span>
         </span>
         <h1
           style={{
@@ -348,20 +366,24 @@ export default function ShopClient({ products }: { products: Product[] }) {
             letterSpacing: '-0.01em',
           }}
         >
-          The <em style={{ color: 'var(--champagne)' }}>Collection</em>
+          <span className="en-only">The <em style={{ color: 'var(--champagne)' }}>Collection</em></span>
+          <span className="ar-only" style={{ color: 'var(--champagne)' }}>المجموعة</span>
         </h1>
         <p
           style={{
             fontSize:    '13px',
             color:       'var(--muted)',
             fontFamily:  "'Amiri', 'Cairo', serif",
-            direction:   'rtl',
             marginTop:   '14px',
-            maxWidth:    '280px',
             lineHeight:  1.9,
           }}
         >
-          المجموعة الكاملة — جمالٌ يُروى بكلِّ تفصيل
+          <span className="en-only" style={{ direction: 'ltr', display: 'inline-block' }}>
+            The complete collection — beauty told in every detail
+          </span>
+          <span className="ar-only" dir="rtl" style={{ display: 'inline-block' }}>
+            المجموعة الكاملة — جمالٌ يُروى بكلِّ تفصيل
+          </span>
         </p>
       </section>
 
@@ -380,7 +402,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
           </span>
           <input
             type="text"
-            placeholder="Search by name, ingredient, finish…"
+            placeholder={isAr ? 'ابحث بالاسم أو المكوّن…' : 'Search by name, ingredient, finish…'}
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
@@ -476,7 +498,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 <svg width="11" height="9" viewBox="0 0 12 9" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
                   <path d="M0 1h12M2.5 4.5h7M5 8h2" />
                 </svg>
-                Filter
+                <span className="en-only">Filter</span>
+                <span className="ar-only">فلتر</span>
                 {activeCount > 0 && (
                   <span style={{
                     position: 'absolute', top: '-6px', right: '-6px',
@@ -499,7 +522,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 <span style={{ color: 'var(--champagne)', fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', marginRight: '4px' }}>
                   {displayed.length}
                 </span>
-                product{displayed.length !== 1 ? 's' : ''}
+                <span className="en-only">product{displayed.length !== 1 ? 's' : ''}</span>
+                <span className="ar-only">منتج</span>
               </p>
             </div>
 
@@ -522,7 +546,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
             >
               {SORT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value} style={{ background: 'var(--deep)' }}>
-                  {o.label}
+                  {isAr ? o.ar : o.en}
                 </option>
               ))}
             </select>
@@ -531,18 +555,39 @@ export default function ShopClient({ products }: { products: Product[] }) {
           {/* Active chips */}
           {activeCount > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
-              {filters.collection !== 'all' && (
-                <Chip label={COLLECTIONS.find(c => c.value === filters.collection)?.label ?? ''} onRemove={() => setFilters(f => ({ ...f, collection: 'all' }))} />
-              )}
+              {filters.collection !== 'all' && (() => {
+                const col = COLLECTIONS.find(c => c.value === filters.collection)
+                return col ? (
+                  <Chip
+                    label={col.label}
+                    labelAr={col.labelAr}
+                    onRemove={() => setFilters(f => ({ ...f, collection: 'all' }))}
+                  />
+                ) : null
+              })()}
               {filters.badges.map(b => (
-                <Chip key={b} label={BADGE_LABELS[b]} onRemove={() => toggleBadge(b)} />
+                <Chip
+                  key={b}
+                  label={BADGE_LABELS[b].en}
+                  labelAr={BADGE_LABELS[b].ar}
+                  onRemove={() => toggleBadge(b)}
+                />
               ))}
-              {filters.shadesOnly  && <Chip label="Has Shades"  onRemove={() => setFilters(f => ({ ...f, shadesOnly: false }))}  />}
-              {filters.inStockOnly && <Chip label="In Stock"    onRemove={() => setFilters(f => ({ ...f, inStockOnly: false }))} />}
-              {filters.maxPrice < priceMax && (
-                <Chip label={`≤ ${formatPrice(filters.maxPrice)}`} onRemove={() => setFilters(f => ({ ...f, maxPrice: priceMax }))} />
+              {filters.shadesOnly  && (
+                <Chip label="Has Shades" labelAr="لديها ظلال" onRemove={() => setFilters(f => ({ ...f, shadesOnly: false }))} />
               )}
-              {search.trim() && <Chip label={`"${search.trim()}"`} onRemove={() => setSearch('')} />}
+              {filters.inStockOnly && (
+                <Chip label="In Stock" labelAr="متوفر" onRemove={() => setFilters(f => ({ ...f, inStockOnly: false }))} />
+              )}
+              {filters.maxPrice < priceMax && (
+                <Chip
+                  label={`≤ ${formatPrice(filters.maxPrice)}`}
+                  onRemove={() => setFilters(f => ({ ...f, maxPrice: priceMax }))}
+                />
+              )}
+              {search.trim() && (
+                <Chip label={`"${search.trim()}"`} onRemove={() => setSearch('')} />
+              )}
             </div>
           )}
 
@@ -556,7 +601,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 fontFamily:  "'Cormorant Garamond', serif",
                 marginBottom: '12px',
               }}>
-                Nothing here
+                <span className="en-only">Nothing here</span>
+                <span className="ar-only">لا توجد نتائج</span>
               </p>
               <p style={{
                 fontSize:    '11px',
@@ -566,7 +612,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 fontFamily:  'Cairo, sans-serif',
                 marginBottom: '36px',
               }}>
-                لم يتم العثور على منتجات
+                <span className="en-only">No products found</span>
+                <span className="ar-only">لم يتم العثور على منتجات</span>
               </p>
               <button
                 onClick={resetFilters}
@@ -583,14 +630,12 @@ export default function ShopClient({ products }: { products: Product[] }) {
                   paddingBottom: '3px',
                 }}
               >
-                Clear All Filters
+                <span className="en-only">Clear All Filters</span>
+                <span className="ar-only">مسح كل الفلاتر</span>
               </button>
             </div>
           ) : (
-            <div
-              key={gridKey}
-              className="shop-grid"
-            >
+            <div key={gridKey} className="shop-grid">
               {displayed.map((p, i) => (
                 <ProductCard key={p._id} product={p} index={i} />
               ))}
@@ -622,7 +667,10 @@ export default function ShopClient({ products }: { products: Product[] }) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <span style={{ ...LABEL_STYLE }}>Filter Products</span>
+              <span style={{ ...LABEL_STYLE }}>
+                <span className="en-only">Filter Products</span>
+                <span className="ar-only">فلترة المنتجات</span>
+              </span>
               <button
                 onClick={() => setDrawerOpen(false)}
                 style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px' }}
@@ -660,7 +708,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 }
 
 // ── Chip helper ──────────────────────────────────────────────────────────────
-function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+function Chip({ label, labelAr, onRemove }: { label: string; labelAr?: string; onRemove: () => void }) {
   return (
     <button
       onClick={onRemove}
@@ -681,7 +729,12 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--champagne)' }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,169,110,0.22)' }}
     >
-      {label}
+      {labelAr ? (
+        <>
+          <span className="en-only">{label}</span>
+          <span className="ar-only">{labelAr}</span>
+        </>
+      ) : label}
       <span style={{ fontSize: '13px', lineHeight: 1, color: 'rgba(201,169,110,0.5)' }}>×</span>
     </button>
   )

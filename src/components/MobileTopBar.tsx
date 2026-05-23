@@ -5,6 +5,7 @@ import { useCartStore } from '@/lib/store'
 import { MENU_CATEGORIES } from '@/lib/menu-categories'
 import ThemeToggle from './ThemeToggle'
 import KuwaitFlag from './KuwaitFlag'
+import USAFlag from './USAFlag'
 
 const EXTRA_LINKS = [
   { href: '/#ritual',  en: 'Ritual',  ar: 'الطقس'    },
@@ -118,7 +119,7 @@ export default function MobileTopBar() {
             className="mob-lang-pill"
             aria-label={lang === 'EN' ? 'Switch to Arabic' : 'Switch to English'}
           >
-            <KuwaitFlag width={16} height={11} />
+            {lang === 'EN' ? <KuwaitFlag width={16} height={11} /> : <USAFlag width={16} height={11} />}
             <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
 
