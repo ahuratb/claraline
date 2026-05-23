@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/store'
 import MegaMenu from '@/components/MegaMenu'
 import KuwaitFlag from '@/components/KuwaitFlag'
@@ -17,6 +18,7 @@ export default function Nav() {
   const [navHeight, setNavHeight] = useState(0)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { count, isOpen, openCart, closeCart } = useCartStore()
+  const { data: session } = useSession()
   const cartCount = count()
   const toggleCart = () => (isOpen ? closeCart() : openCart())
 
@@ -162,6 +164,19 @@ export default function Nav() {
             {lang === 'EN' ? <KuwaitFlag width={20} height={14} /> : <USAFlag width={20} height={14} />}
             <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
+
+          {/* Account icon */}
+          <Link
+            href={session ? '/account' : '/login'}
+            className="w-[40px] h-[40px] border border-[rgba(201,169,110,0.3)] flex items-center justify-center hover:border-[var(--champagne)] hover:bg-[rgba(201,169,110,0.08)] transition-all duration-300"
+            aria-label={session ? 'My account' : 'Sign in'}
+            style={{ color: session ? 'var(--champagne)' : 'var(--muted)' }}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </Link>
 
           <button
             onClick={toggleCart}

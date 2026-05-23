@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
-import { formatPrice, generateOrderId } from '@/lib/utils'
+import { formatPrice } from '@/lib/utils'
 import { Customer } from '@/types'
 import toast from 'react-hot-toast'
 
@@ -44,13 +44,15 @@ export default function CheckoutForm() {
 
     setLoading(true)
     try {
-      const orderId = generateOrderId()
-
-      await fetch('/api/orders', {
-        method: 'POST',
+      // Save order to MongoDB, get back a real orderId
+      const orderRes = await fetch('/api/orders', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: orderId, items, total: cartTotal, customer, status: 'pending' }),
+        body:    JSON.stringify({ items, total: cartTotal, customer }),
       })
+      const orderData = await orderRes.json()
+      if (!orderData.orderId) throw new Error('Order creation failed')
+      const orderId = orderData.orderId
 
       const res = await fetch('/api/payment/initiate', {
         method: 'POST',

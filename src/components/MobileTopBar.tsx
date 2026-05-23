@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/store'
 import { MENU_CATEGORIES } from '@/lib/menu-categories'
 import ThemeToggle from './ThemeToggle'
@@ -23,6 +24,7 @@ export default function MobileTopBar() {
   const closeMenu  = useCartStore(s => s.closeMenu)
   const openCart   = useCartStore(s => s.openCart)
   const cartCount  = useCartStore(s => s.count())
+  const { data: session } = useSession()
 
   useEffect(() => {
     if (typeof document !== 'undefined' && document.documentElement.classList.contains('lang-ar')) {
@@ -122,6 +124,20 @@ export default function MobileTopBar() {
             {lang === 'EN' ? <KuwaitFlag width={16} height={11} /> : <USAFlag width={16} height={11} />}
             <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
+
+          {/* Account icon */}
+          <Link
+            href={session ? '/account' : '/login'}
+            className="mob-topbar-cart"
+            aria-label={session ? 'My account' : 'Sign in'}
+            onClick={closeMenu}
+            style={{ color: session ? 'var(--champagne)' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </Link>
 
           <button className="mob-topbar-cart" onClick={openCart} aria-label="Open cart">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

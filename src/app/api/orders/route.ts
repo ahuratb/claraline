@@ -1,36 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { getDb } from '@/lib/mongodb'
 
-const orderSchema = z.object({
-  id: z.string(),
-  items: z.array(z.object({
-    productId: z.string(),
-    name_en: z.string(),
-    name_ar: z.string(),
-    price: z.number(),
-    quantity: z.number(),
-    shade: z.string().optional(),
-  })),
-  total: z.number(),
-  customer: z.object({
-    name: z.string(),
-    email: z.string().email(),
-    phone: z.string(),
-    address: z.string(),
-    city: z.string(),
-    country: z.string(),
-  }),
-  status: z.enum(['pending', 'paid', 'failed']),
-})
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const db     = await getDb()
+  const orders = await db.collection('orders')
+    .find({ userId: session.user.id })
+    .sort({ createdAt: -1 })
+    .toArray()
+
+  return NextResponse.json({ orders })
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body = orderSchema.parse(await req.json())
-    // In production: persist to Sanity or your DB here
-    console.log('[order created]', body.id)
-    return NextResponse.json({ success: true, orderId: body.id })
-  } catch (err) {
-    console.error('[orders/POST]', err)
-    return NextResponse.json({ error: 'Invalid order data' }, { status: 400 })
+    const body    = await req.json()
+    const session = await getServerSession(authOptions)
+    const db      = await getDb()
+
+    const result = await db.collection('orders').insertOne({
+      userId:    session?.user?.id ?? null,
+      items:     body.items,
+      total:     body.total,
+      customer:  body.customer,
+      status:    'pending',
+      paymentId: null,
+      createdAt: new Date(),
+    })
+
+    return NextResponse.json({ orderId: result.insertedId.toString() })
+  } catch {
+    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 }
