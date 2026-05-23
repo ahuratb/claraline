@@ -382,38 +382,38 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
       </div>
 
       {/* Desktop / tablet horizontal carousel */}
-      <div
-        className="carousel-track-wrap carousel-desktop-track"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
-        onDragStart={(e) => e.preventDefault()}
-        style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-      >
+      <div className="carousel-desktop">
         <div
-          className="carousel-track reveal-target"
-          id={id}
-          style={{ transform: `translateX(-${offset}px)`, transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)' }}
+          className="carousel-track-wrap"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
+          onDragStart={(e) => e.preventDefault()}
+          style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
         >
-          {useReal
-            ? products!.map(renderRealCard)
-            : (cards ?? []).map(renderDemoCard)
-          }
+          <div
+            className="carousel-track reveal-target"
+            id={id}
+            style={{ transform: `translateX(-${offset}px)`, transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)' }}
+          >
+            {useReal
+              ? products!.map(renderRealCard)
+              : (cards ?? []).map(renderDemoCard)
+            }
+          </div>
         </div>
       </div>
 
       {/* Mobile 2-col grid (hidden on desktop via CSS) */}
-      <div className="carousel-mobile-wrap">
-        <div className="carousel-mobile-grid">
-          {useReal
-            ? products!.slice(0, 6).map(renderRealCard)
-            : (cards ?? []).slice(0, 6).map(renderDemoCard)
-          }
-        </div>
+      <div className="carousel-mobile">
+        {useReal
+          ? products!.slice(0, 6).map(renderRealCard)
+          : (cards ?? []).slice(0, 6).map(renderDemoCard)
+        }
         {viewAllHref && (
           <Link href={viewAllHref} className="carousel-view-all">
             <span className="en-only">View All →</span>
