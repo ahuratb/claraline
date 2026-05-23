@@ -1380,29 +1380,6 @@ html.lang-ar .ls-image { right: auto; left: 0; }
 }
 
 /* ═══════════════════════════════════════════════════
-   MEGA MENU SECTION HEADER (mobile drawer)
-═══════════════════════════════════════════════════ */
-.megamenu-section-head {
-  padding: 20px 24px 10px;
-  font-size: 10px;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--champagne);
-  opacity: 0.75;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.megamenu-section-head-ar {
-  color: var(--muted);
-  opacity: 0.6;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-.megamenu-cats { padding-left: 16px; }
-.megamenu-cats .megamenu-cat-head { padding-left: 8px; }
-
-/* ═══════════════════════════════════════════════════
    MEGA MENU PANEL (desktop / tablet)
 ═══════════════════════════════════════════════════ */
 .megamenu-panel {
