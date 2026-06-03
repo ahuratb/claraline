@@ -100,20 +100,22 @@ export default function MobileTopBar() {
     <>
       {/* ─── Top bar ─── */}
       <header className="mob-topbar">
-        <button
-          className={`mob-ham${isMenuOpen ? ' open' : ''}`}
-          onClick={() => isMenuOpen ? closeMenu() : openMenu()}
-          aria-label="Menu"
-        >
-          <span /><span /><span />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <button
+            className={`mob-ham${isMenuOpen ? ' open' : ''}`}
+            onClick={() => isMenuOpen ? closeMenu() : openMenu()}
+            aria-label="Menu"
+          >
+            <span /><span /><span />
+          </button>
+          <ThemeToggle size={36} iconSize={16} />
+        </div>
 
         <Link href="/" className="mob-topbar-logo" onClick={closeMenu} aria-label="Claraline home">
           <span className="claraline-logo" style={{ width: '120px', height: '30px' }} />
         </Link>
 
         <div className="mob-topbar-actions">
-          <ThemeToggle size={36} iconSize={16} />
 
           <button
             type="button"

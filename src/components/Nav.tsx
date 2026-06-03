@@ -67,6 +67,11 @@ export default function Nav() {
   const openMega = () => { cancelClose(); setMegaOpen(true) }
   const toggleMega = () => { cancelClose(); setMegaOpen(o => !o) }
 
+  // In light mode before first scroll the nav is transparent over the dark hero
+  // video — force dark-mode palette so text stays readable, then revert once
+  // the blurred backdrop kicks in on scroll.
+  const forceLight = theme === 'light' && !scrolled
+
   return (
     <>
       <nav
@@ -81,6 +86,11 @@ export default function Nav() {
           background: scrolled
             ? 'color-mix(in srgb, var(--obsidian) 80%, transparent)'
             : 'transparent',
+          ...(forceLight && {
+            '--ivory':    '#FAF5EE',
+            '--champagne':'#C9A96E',
+            '--muted':    '#9a8a7a',
+          } as React.CSSProperties),
         }}
       >
         {/* Logo */}
@@ -92,7 +102,10 @@ export default function Nav() {
         >
           <span
             className="claraline-logo"
-            style={{ width: '180px', height: '44px' }}
+            style={{
+              width: '180px', height: '44px',
+              ...(forceLight && { backgroundImage: "url('/logo.png')" }),
+            }}
           />
         </Link>
 
@@ -119,7 +132,7 @@ export default function Nav() {
             </button>
           </li>
           {[
-            { label: 'Ritual', href: '/#ritual' },
+            { label: 'Home',  href: '/' },
             { label: 'About', href: '/#about' },
           ].map(({ label, href }) => (
             <li key={label}>

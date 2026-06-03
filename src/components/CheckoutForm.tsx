@@ -263,8 +263,8 @@ export default function CheckoutForm() {
           </button>
 
           <p className="co-secure">
-            <span className="en-only">Secured by MyFatoorah · KNET · Tabby · Visa · Mastercard</span>
-            <span className="ar-only">مؤمّن بواسطة MyFatoorah · كي نت · تابي · فيزا · ماستركارد</span>
+            <span className="en-only">Secured by Tap Payments · KNET · Visa · Mastercard</span>
+            <span className="ar-only">مؤمّن بواسطة Tap Payments · كي نت · فيزا · ماستركارد</span>
           </p>
         </aside>
 

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import VideoScroll from '@/components/VideoScroll'
 import { LipCarousel, EyeCarousel } from '@/components/CinematicCarousel'
 import NewsletterForm from '@/components/NewsletterForm'
@@ -325,21 +326,64 @@ export default async function HomePage() {
               <div className="footer-col-title en-only">Info</div>
               <div className="footer-col-title ar-only">معلومات</div>
               <ul className="footer-links en-only">
-                {['About Us', 'Ingredients', 'Sustainability', 'Halal Certificate', 'Privacy Policy'].map(l => (
+                {['About Us', 'Ingredients', 'Sustainability', 'Halal Certificate'].map(l => (
                   <li key={l}>{l}</li>
                 ))}
+                <li><Link href="/privacy">Privacy Policy</Link></li>
+                <li><Link href="/terms">Terms &amp; Conditions</Link></li>
               </ul>
               <ul className="footer-links ar-only">
-                {['من نحن', 'المكونات', 'الاستدامة', 'شهادة حلال', 'سياسة الخصوصية'].map(l => (
+                {['من نحن', 'المكونات', 'الاستدامة', 'شهادة حلال'].map(l => (
                   <li key={l}>{l}</li>
                 ))}
+                <li><Link href="/privacy">سياسة الخصوصية</Link></li>
+                <li><Link href="/terms">الشروط والأحكام</Link></li>
               </ul>
             </div>
           </div>
           <div className="footer-bottom">
-            <span className="footer-copy en-only">© 2024 Claraline. All rights reserved.</span>
-            <span className="footer-copy ar-only">© 2024 كالرالاين. جميع الحقوق محفوظة.</span>
-            <span className="footer-copy">KNET · Tabby · Tamara · Visa · Mastercard</span>
+            <span className="footer-copy en-only">© 2025 Claraline Kuwait. All rights reserved.</span>
+            <span className="footer-copy ar-only">© 2025 كالرالاين الكويت. جميع الحقوق محفوظة.</span>
+            <span className="footer-copy en-only" style={{ display: 'flex', gap: '16px' }}>
+              <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>Privacy</Link>
+              <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>Terms</Link>
+            </span>
+            <span className="footer-copy ar-only" style={{ display: 'flex', gap: '16px', direction: 'rtl' }}>
+              <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>الخصوصية</Link>
+              <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>الشروط</Link>
+            </span>
+            <span className="footer-copy">KNET · Tap Pay · Visa · Mastercard · Apple Pay</span>
+          </div>
+
+          {/* ZoeyBloom credit */}
+          <div style={{
+            borderTop: '1px solid rgba(201,169,110,0.08)',
+            padding: '24px 40px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}>
+            <p className="en-only" style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', margin: 0 }}>
+              Powered by{' '}
+              <strong style={{ color: 'var(--champagne)', letterSpacing: '2px' }}>ZoeyBloom</strong>
+            </p>
+            <p className="ar-only" style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px', direction: 'rtl', textAlign: 'right', margin: 0 }}>
+              مُطوَّر بواسطة{' '}
+              <strong style={{ color: 'var(--champagne)', letterSpacing: '1px' }}>ZoeyBloom</strong>
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center' }}>
+              <a href="tel:+96541119050" style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px', textDecoration: 'none', textTransform: 'none' }}>
+                +965 4111 9050
+              </a>
+              <a href="mailto:info@zoeybloom.me" style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '1px', textDecoration: 'none', textTransform: 'none' }}>
+                info@zoeybloom.me
+              </a>
+              <span style={{ color: 'var(--muted)', fontSize: '11px', letterSpacing: '0.5px', textTransform: 'none' }}>
+                The 8 Mall, Floor −1, Office 17, Salem AlMubarak St., Al Salmiya, Kuwait
+              </span>
+            </div>
           </div>
         </footer>
       </div>

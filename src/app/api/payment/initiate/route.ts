@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendPayment } from '@/lib/myfatoorah'
+import { createCharge } from '@/lib/tap'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -10,7 +10,6 @@ const schema = z.object({
     email: z.string().email(),
     phone: z.string(),
   }),
-  lang: z.enum(['AR', 'EN']).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -18,23 +17,21 @@ export async function POST(req: NextRequest) {
     const body = schema.parse(await req.json())
     const base = process.env.NEXT_PUBLIC_BASE_URL
 
-    const result = await sendPayment({
+    const charge = await createCharge({
       amount: body.amount,
       orderId: body.orderId,
       customerName: body.customer.name,
       customerEmail: body.customer.email,
       customerPhone: body.customer.phone,
-      successUrl: `${base}/order-success?id=${body.orderId}`,
-      failUrl: `${base}/checkout?error=payment_failed`,
-      callBackUrl: `${base}/api/payment/callback`,
-      language: body.lang ?? 'AR',
+      redirectUrl: `${base}/api/payment/callback`,
+      webhookUrl: `${base}/api/payment/callback`,
     })
 
-    if (!result.IsSuccess) {
-      return NextResponse.json({ error: result.Message }, { status: 400 })
+    if (!charge?.transaction?.url) {
+      return NextResponse.json({ error: charge?.message ?? 'Payment initiation failed' }, { status: 400 })
     }
 
-    return NextResponse.json({ url: result.Data.InvoiceURL })
+    return NextResponse.json({ url: charge.transaction.url })
   } catch (err) {
     console.error('[payment/initiate]', err)
     return NextResponse.json({ error: 'Payment initiation failed' }, { status: 500 })
