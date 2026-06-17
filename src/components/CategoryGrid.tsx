@@ -50,6 +50,12 @@ function CircleCarousel({ categories }: { categories: CategoryItem[] }) {
   const didDragRef     = useRef(false)
   const [isDragging, setIsDragging] = useState(false)
 
+  const arrow = (dir: -1 | 1) => {
+    const el = wrapRef.current
+    if (!el) return
+    el.scrollBy({ left: dir * Math.round(el.clientWidth * 0.7), behavior: 'smooth' })
+  }
+
   const onPointerDown = (e: React.PointerEvent) => {
     if (!wrapRef.current) return
     if (e.pointerType !== 'mouse') return
@@ -78,19 +84,27 @@ function CircleCarousel({ categories }: { categories: CategoryItem[] }) {
   }
 
   return (
-    <div
-      ref={wrapRef}
-      className={`cat-circle-track${isDragging ? ' dragging' : ''}`}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={stopDrag}
-      onPointerLeave={stopDrag}
-      onPointerCancel={stopDrag}
-      onClickCapture={onClickCapture}
-    >
-      {categories.map((cat, i) => (
-        <CircleItem key={cat.id} cat={cat} index={i} />
-      ))}
+    <div className="cat-carousel">
+      <button className="carousel-arrow carousel-side prev" onClick={() => arrow(-1)} aria-label="Previous">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+      </button>
+      <button className="carousel-arrow carousel-side next" onClick={() => arrow(1)} aria-label="Next">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+      </button>
+      <div
+        ref={wrapRef}
+        className={`cat-circle-track${isDragging ? ' dragging' : ''}`}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={stopDrag}
+        onPointerLeave={stopDrag}
+        onPointerCancel={stopDrag}
+        onClickCapture={onClickCapture}
+      >
+        {categories.map((cat, i) => (
+          <CircleItem key={cat.id} cat={cat} index={i} />
+        ))}
+      </div>
     </div>
   )
 }

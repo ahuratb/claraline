@@ -85,6 +85,7 @@ export interface SiteContent {
     labelEn: string; labelAr: string
     titleEn: string; titleAr: string
     subEn: string; subAr: string
+    image?: string
   }
   footer: {
     tagEn: string; tagAr: string
@@ -107,6 +108,12 @@ export const defaultSiteContent: SiteContent = {
     { id: 'primers',     nameEn: 'Primers',       nameAr: 'البرايمر',              image: '/primers.png' },
     { id: 'highlighter', nameEn: 'Highlighter',   nameAr: 'الهايلايتر',            image: '/highlighter.png' },
     { id: 'concealer',   nameEn: 'Concealer',     nameAr: 'الكونسيلر',             image: '/concealer.png' },
+    { id: 'mascara',     nameEn: 'Mascara',       nameAr: 'ماسكارا',               image: '' },
+    { id: 'lipstick',    nameEn: 'Lipstick',      nameAr: 'أحمر شفاه',            image: '' },
+    { id: 'foundation',  nameEn: 'Foundation',    nameAr: 'كريم أساس',            image: '' },
+    { id: 'eyeshadow',   nameEn: 'Eyeshadow',     nameAr: 'ظلال العيون',          image: '' },
+    { id: 'blush',       nameEn: 'Blush',         nameAr: 'بلاش',                  image: '' },
+    { id: 'powder',      nameEn: 'Powder',        nameAr: 'بودرة',                 image: '' },
   ],
 
   slides: [
@@ -116,7 +123,7 @@ export const defaultSiteContent: SiteContent = {
       headline: 'The Art<br/>of <em>Color</em>', headlineAr: 'فن<br/><em>الألوان</em>',
       sub: 'Luxury lip rituals crafted for you', subAr: 'طقوس شفاه فاخرة صُممت لكِ',
       cta: 'Discover Now', ctaAr: 'اكتشفي الآن', href: '/shop',
-      bg: 'radial-gradient(ellipse at 30% 60%,#2a0608 0%,#0a0606 55%),radial-gradient(ellipse at 80% 20%,#1a0810 0%,transparent 60%)',
+      bg: 'radial-gradient(ellipse at 75% 50%,#fbe4e0 0%,#f3ece6 55%),linear-gradient(120deg,#f7eee9 0%,#efe7df 100%)',
       image: '/slider-4.png',
     },
     {
@@ -125,7 +132,7 @@ export const defaultSiteContent: SiteContent = {
       headline: 'Lips that<br/>speak <em>softly</em>', headlineAr: 'شفاه<br/><em>تهمس</em>',
       sub: 'Velvet finish, lasting comfort', subAr: 'لمسة مخملية تدوم بكل راحة',
       cta: 'Lip Collection', ctaAr: 'مجموعة الشفاه', href: '#products1',
-      bg: 'radial-gradient(ellipse at 70% 40%,#0e1c2a 0%,#060a14 55%),radial-gradient(ellipse at 20% 80%,#1a0e12 0%,transparent 60%)',
+      bg: 'radial-gradient(ellipse at 75% 50%,#dbe9f2 0%,#eef1f3 55%),linear-gradient(120deg,#eef3f6 0%,#e3ebf0 100%)',
       image: '/slider-2.png',
     },
     {
@@ -134,7 +141,7 @@ export const defaultSiteContent: SiteContent = {
       headline: 'Light that<br/><em>belongs</em> to you', headlineAr: 'إشراقة<br/><em>تليق</em> بكِ',
       sub: 'Powder finish, formulated for Gulf skin', subAr: 'بودرة مُصاغة خصيصاً لبشرة الخليج',
       cta: 'Our Story', ctaAr: 'قصتنا', href: '/#ritual',
-      bg: 'radial-gradient(ellipse at 50% 30%,#0e1322 0%,#06080e 55%),radial-gradient(ellipse at 80% 70%,#1a1008 0%,transparent 60%)',
+      bg: 'radial-gradient(ellipse at 75% 50%,#eee6f2 0%,#f1eef4 55%),linear-gradient(120deg,#f2eef6 0%,#e8e2ef 100%)',
       image: '/slider-3.png',
     },
     {
@@ -143,7 +150,7 @@ export const defaultSiteContent: SiteContent = {
       headline: 'Your beauty<br/><em>ritual</em> awaits', headlineAr: 'طقس جمالكِ<br/><em>ينتظركِ</em>',
       sub: 'Join thousands of women across the Gulf', subAr: 'انضمي إلى آلاف النساء في أنحاء الخليج',
       cta: 'Shop Now', ctaAr: 'تسوقي الآن', href: '/shop',
-      bg: 'radial-gradient(ellipse at 40% 50%,#0f1a10 0%,#080806 55%),radial-gradient(ellipse at 60% 20%,#1a1008 0%,transparent 60%)',
+      bg: 'radial-gradient(ellipse at 50% 40%,#e7efe6 0%,#eef1ec 55%),linear-gradient(120deg,#eef2ea 0%,#e4ece2 100%)',
     },
   ],
 
@@ -263,6 +270,7 @@ export const defaultSiteContent: SiteContent = {
     titleAr: 'كوني <em>الأولى</em>',
     subEn: 'Get exclusive offers and be the first to discover new arrivals',
     subAr: 'احصلي على العروض الحصرية وأحدث الإضافات',
+    image: '/banner-2.jpg',
   },
 
   footer: {

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import VideoScroll from '@/components/VideoScroll'
-import { LipCarousel, EyeCarousel } from '@/components/CinematicCarousel'
+import { LipCarousel, EyeCarousel, FaceCarousel } from '@/components/CinematicCarousel'
 import NewsletterForm from '@/components/NewsletterForm'
+import StatsStrip from '@/components/StatsStrip'
 import CategoryGrid from '@/components/CategoryGrid'
 import LuxurySlider from '@/components/LuxurySlider'
 import { getProductsByCollection } from '@/lib/sanity'
@@ -36,9 +37,10 @@ function Marquee({ items, reverse, editPath }: { items: MarqueeItem[]; reverse?:
 }
 
 export default async function HomePage() {
-  const [lipProducts, eyeProducts, content] = await Promise.all([
+  const [lipProducts, eyeProducts, faceProducts, content] = await Promise.all([
     getProductsByCollection('lip'),
     getProductsByCollection('eye'),
+    getProductsByCollection('face'),
     getSiteContent(),
   ])
 
@@ -78,6 +80,13 @@ export default async function HomePage() {
       {/* ══════════════════ FULL-SCREEN LUXURY SLIDER ══════════════════ */}
       <LuxurySlider slides={content.slides} />
 
+      {/* ══════════════════ FACE CAROUSEL (between slider & banners) ══════════════════ */}
+      <div className="fixed-section" id="products-face">
+        <div className="sep"></div>
+        <FaceCarousel products={faceProducts} />
+        <div className="sep"></div>
+      </div>
+
       {/* ══════════════════ VIDEOS 2 + 5 — SIDE BY SIDE ══════════════════ */}
       <div className="video-row-pair">
         <div className="video-row-half">
@@ -114,15 +123,7 @@ export default async function HomePage() {
       <div className="fixed-section">
         <Marquee items={content.marqueeTop} editPath="marqueeTop" />
 
-        <div className="stats-strip reveal-target">
-          {content.stats.map((s, i) => (
-            <div key={s.num + s.en} className="stat-item" data-edit={`stats.${i}`} data-edit-label={`Stat ${i + 1}`}>
-              <div className="stat-num">{s.num}</div>
-              <div className="stat-label en-only">{s.en}</div>
-              <div className="stat-ar ar-only">{s.ar}</div>
-            </div>
-          ))}
-        </div>
+        <StatsStrip stats={content.stats} />
 
         <div className="sep"></div>
       </div>
@@ -195,16 +196,22 @@ export default async function HomePage() {
       <div className="fixed-section">
         <div className="sep"></div>
 
-        <div className="newsletter" data-edit="newsletter" data-edit-label="Newsletter">
-          <span className="nl-label en-only">{content.newsletter.labelEn}</span>
-          <span className="nl-label ar-only">{content.newsletter.labelAr}</span>
-          <h2 className="nl-title">
-            <span className="en-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleEn }} />
-            <span className="ar-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleAr }} />
-          </h2>
-          <p className="nl-sub en-only" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{content.newsletter.subEn}</p>
-          <p className="nl-sub ar-only">{content.newsletter.subAr}</p>
-          <NewsletterForm />
+        <div className={`newsletter${content.newsletter.image ? ' nl-split' : ''}`} data-edit="newsletter" data-edit-label="Newsletter">
+          <div className="nl-content">
+            <span className="nl-label en-only">{content.newsletter.labelEn}</span>
+            <span className="nl-label ar-only">{content.newsletter.labelAr}</span>
+            <h2 className="nl-title">
+              <span className="en-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleEn }} />
+              <span className="ar-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleAr }} />
+            </h2>
+            <p className="nl-sub en-only" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{content.newsletter.subEn}</p>
+            <p className="nl-sub ar-only">{content.newsletter.subAr}</p>
+            <NewsletterForm />
+          </div>
+          {content.newsletter.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <div className="nl-banner"><img src={content.newsletter.image} alt="" /></div>
+          )}
         </div>
 
         {/* Marquee 2 */}

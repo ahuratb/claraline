@@ -52,7 +52,16 @@ async function main() {
     const db = client.db('claraline')
     const res = await db.collection('siteContent').updateOne(
       { _id: 'homepage' as never },
-      { $set: { 'content.hero': hero, 'content.sideLeft': sideLeft, 'content.sideRight': sideRight, updatedAt: new Date() } },
+      {
+        $set: {
+          'content.hero': hero, 'content.sideLeft': sideLeft, 'content.sideRight': sideRight,
+          'content.newsletter.image': '/banner-2.jpg',
+          updatedAt: new Date(),
+        },
+        // Drop stored categories/slides so the new code defaults take over
+        // (more categories, light-theme slider).
+        $unset: { 'content.categories': '', 'content.slides': '' },
+      },
     )
     if (res.matchedCount === 0) {
       console.log('No saved siteContent doc — code defaults already carry the banners. Nothing to patch.')

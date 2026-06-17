@@ -439,6 +439,23 @@ export function LipCarousel({ products }: { products?: Product[] }) {
   )
 }
 
+export function FaceCarousel({ products }: { products?: Product[] }) {
+  return (
+    <Carousel
+      id="c5"
+      labelEn="Face Collection"
+      labelAr="مجموعة الوجه"
+      titleEn={<>Face <em>Rituals</em></>}
+      titleAr={<>طقوس <em>الوجه</em></>}
+      descEn="A flawless base, made for you"
+      descAr="أساس مثالي صُنع من أجلكِ"
+      cards={LIP_CARDS}
+      products={products}
+      viewAllHref="/shop?collection=face"
+    />
+  )
+}
+
 export function EyeCarousel({ products }: { products?: Product[] }) {
   return (
     <Carousel

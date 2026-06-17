@@ -642,6 +642,9 @@ export default function AdminClient() {
                   <Area label="Subtext (EN)" value={content.newsletter.subEn} onChange={v => patch(d => { d.newsletter.subEn = v })} />
                   <Area label="Subtext (AR)" ar value={content.newsletter.subAr} onChange={v => patch(d => { d.newsletter.subAr = v })} />
                 </div>
+                <ImageField label="Side banner image" value={content.newsletter.image}
+                  onChange={v => patch(d => { d.newsletter.image = v || undefined })}
+                  hint="Fills the right half of the newsletter block. Leave empty to center the form." />
               </div>
             </>
           )}
