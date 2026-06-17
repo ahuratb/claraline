@@ -47,6 +47,7 @@ function LoginForm() {
 
   const router       = useRouter()
   const searchParams = useSearchParams()
+  const callbackUrl  = searchParams.get('callbackUrl') || '/account'
 
   useEffect(() => {
     if (searchParams.get('registered') === '1') setNotice('Account created — sign in to continue')
@@ -70,7 +71,7 @@ function LoginForm() {
       setError('Invalid email or password')
       setLoading(false)
     } else {
-      router.push('/account')
+      router.push(callbackUrl)
     }
   }
 
@@ -78,7 +79,7 @@ function LoginForm() {
     setGLoading(true)
     setError('')
     setNotice('')
-    await signIn('google', { callbackUrl: '/account' })
+    await signIn('google', { callbackUrl })
   }
 
   return (

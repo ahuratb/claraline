@@ -5,14 +5,14 @@ import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/store'
 import MegaMenu from '@/components/MegaMenu'
 import KuwaitFlag from '@/components/KuwaitFlag'
-import USAFlag from '@/components/USAFlag'
+import UKFlag from '@/components/UKFlag'
 
 type Theme = 'dark' | 'light'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [lang, setLang] = useState<'EN' | 'AR'>('EN')
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
   const [megaOpen, setMegaOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const [navHeight, setNavHeight] = useState(0)
@@ -114,6 +114,16 @@ export default function Nav() {
           className="flex gap-10 list-none"
           style={{ animation: 'fadeUp 1s 0.5s forwards', opacity: 0 }}
         >
+          {/* Home */}
+          <li>
+            <Link
+              href="/"
+              className="text-[11px] tracking-[0.32em] uppercase text-[var(--ivory)] opacity-70 hover:opacity-100 hover:text-[var(--champagne)] transition-all duration-300 no-underline"
+            >
+              {lang === 'EN' ? 'Home' : 'الرئيسية'}
+            </Link>
+          </li>
+
           {/* Collection — opens mega menu */}
           <li
             onMouseEnter={openMega}
@@ -128,22 +138,19 @@ export default function Nav() {
               className={`text-[11px] tracking-[0.32em] uppercase opacity-70 hover:opacity-100 transition-all duration-300 bg-transparent border-0 cursor-pointer ${megaOpen ? 'text-[var(--champagne)] opacity-100' : 'text-[var(--ivory)] hover:text-[var(--champagne)]'}`}
               style={{ fontFamily: 'Cairo, sans-serif' }}
             >
-              Collection
+              {lang === 'EN' ? 'Collection' : 'المجموعة'}
             </button>
           </li>
-          {[
-            { label: 'Home',  href: '/' },
-            { label: 'About', href: '/#about' },
-          ].map(({ label, href }) => (
-            <li key={label}>
-              <Link
-                href={href}
-                className="text-[11px] tracking-[0.32em] uppercase text-[var(--ivory)] opacity-70 hover:opacity-100 hover:text-[var(--champagne)] transition-all duration-300 no-underline"
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
+
+          {/* About */}
+          <li>
+            <Link
+              href="/#about"
+              className="text-[11px] tracking-[0.32em] uppercase text-[var(--ivory)] opacity-70 hover:opacity-100 hover:text-[var(--champagne)] transition-all duration-300 no-underline"
+            >
+              {lang === 'EN' ? 'About' : 'من إحنا'}
+            </Link>
+          </li>
         </ul>
 
         {/* Right: theme + lang + cart */}
@@ -174,7 +181,7 @@ export default function Nav() {
             className="nav-lang-pill"
             aria-label={lang === 'EN' ? 'Switch to Arabic' : 'Switch to English'}
           >
-            {lang === 'EN' ? <KuwaitFlag width={20} height={14} /> : <USAFlag width={20} height={14} />}
+            {lang === 'EN' ? <KuwaitFlag width={20} height={14} /> : <UKFlag width={20} height={14} />}
             <span>{lang === 'EN' ? 'عربي' : 'EN'}</span>
           </button>
 

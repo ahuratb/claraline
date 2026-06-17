@@ -28,10 +28,11 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) return null
 
         return {
-          id:    user._id.toString(),
-          email: user.email as string,
-          name:  user.name  as string,
-          image: (user.image as string | undefined) ?? null,
+          id:      user._id.toString(),
+          email:   user.email as string,
+          name:    user.name  as string,
+          image:   (user.image as string | undefined) ?? null,
+          isAdmin: user.isAdmin === true,
         }
       },
     }),
@@ -56,6 +57,7 @@ export const authOptions: NextAuthOptions = {
             { $set: { lastLogin: new Date(), image: user.image } },
           )
           user.id = existing._id.toString()
+          user.isAdmin = existing.isAdmin === true
         } else {
           const result = await db.collection('users').insertOne({
             name:          user.name,
@@ -91,12 +93,14 @@ export const authOptions: NextAuthOptions = {
         } else {
           token.id = user.id
         }
+        token.isAdmin = user.isAdmin === true
       }
       return token
     },
 
     async session({ session, token }) {
       if (token?.id) session.user.id = token.id as string
+      session.user.isAdmin = token.isAdmin === true
       return session
     },
   },

@@ -1,81 +1,10 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import type { SlideItem } from '@/lib/site-content'
 
-interface Slide {
-  id: number
-  label: string
-  labelAr: string
-  headline: string
-  headlineAr: string
-  sub: string
-  subAr: string
-  cta: string
-  ctaAr: string
-  href: string
-  bg: string
-  image?: string
-}
-
-const SLIDES: Slide[] = [
-  {
-    id: 1,
-    label: 'New Collection · 2024',
-    labelAr: 'المجموعة الجديدة · 2024',
-    headline: 'The Art<br/>of <em>Color</em>',
-    headlineAr: 'فن<br/><em>الألوان</em>',
-    sub: 'Luxury lip rituals crafted for you',
-    subAr: 'طقوس شفاه فاخرة صُممت لكِ',
-    cta: 'Discover Now',
-    ctaAr: 'اكتشفي الآن',
-    href: '/shop',
-    bg: 'radial-gradient(ellipse at 30% 60%,#2a0608 0%,#0a0606 55%),radial-gradient(ellipse at 80% 20%,#1a0810 0%,transparent 60%)',
-    image: '/slider-4.png',
-  },
-  {
-    id: 2,
-    label: 'Lip Collection',
-    labelAr: 'مجموعة الشفاه',
-    headline: 'Lips that<br/>speak <em>softly</em>',
-    headlineAr: 'شفاه<br/><em>تهمس</em>',
-    sub: 'Velvet finish, lasting comfort',
-    subAr: 'لمسة مخملية تدوم بكل راحة',
-    cta: 'Lip Collection',
-    ctaAr: 'مجموعة الشفاه',
-    href: '#products1',
-    bg: 'radial-gradient(ellipse at 70% 40%,#0e1c2a 0%,#060a14 55%),radial-gradient(ellipse at 20% 80%,#1a0e12 0%,transparent 60%)',
-    image: '/slider-2.png',
-  },
-  {
-    id: 3,
-    label: 'Radiant Skin',
-    labelAr: 'بشرة مُشرقة',
-    headline: 'Light that<br/><em>belongs</em> to you',
-    headlineAr: 'إشراقة<br/><em>تليق</em> بكِ',
-    sub: 'Powder finish, formulated for Gulf skin',
-    subAr: 'بودرة مُصاغة خصيصاً لبشرة الخليج',
-    cta: 'Our Story',
-    ctaAr: 'قصتنا',
-    href: '/#ritual',
-    bg: 'radial-gradient(ellipse at 50% 30%,#0e1322 0%,#06080e 55%),radial-gradient(ellipse at 80% 70%,#1a1008 0%,transparent 60%)',
-    image: '/slider-3.png',
-  },
-  {
-    id: 4,
-    label: 'The Ritual',
-    labelAr: 'الطقس',
-    headline: 'Your beauty<br/><em>ritual</em> awaits',
-    headlineAr: 'طقس جمالكِ<br/><em>ينتظركِ</em>',
-    sub: 'Join thousands of women across the Gulf',
-    subAr: 'انضمي إلى آلاف النساء في أنحاء الخليج',
-    cta: 'Shop Now',
-    ctaAr: 'تسوقي الآن',
-    href: '/shop',
-    bg: 'radial-gradient(ellipse at 40% 50%,#0f1a10 0%,#080806 55%),radial-gradient(ellipse at 60% 20%,#1a1008 0%,transparent 60%)',
-  },
-]
-
-export default function LuxurySlider() {
+export default function LuxurySlider({ slides }: { slides: SlideItem[] }) {
+  const SLIDES = slides
   const [current, setCurrent] = useState(0)
   const pausedRef = useRef(false)
 
@@ -84,12 +13,13 @@ export default function LuxurySlider() {
       if (!pausedRef.current) setCurrent(c => (c + 1) % SLIDES.length)
     }, 5000)
     return () => clearInterval(id)
-  }, [])
+  }, [SLIDES.length])
 
   const goTo = (i: number) => setCurrent(i)
   const prev = () => setCurrent(c => (c - 1 + SLIDES.length) % SLIDES.length)
   const next = () => setCurrent(c => (c + 1) % SLIDES.length)
 
+  if (SLIDES.length === 0) return null
   const slide = SLIDES[current]
 
   const hasImage = !!slide.image
@@ -137,7 +67,12 @@ export default function LuxurySlider() {
       </div>
 
       {/* Animated content — key remounts on slide change, firing CSS animation */}
-      <div key={current} className={`ls-content${hasImage ? ' ls-content-left' : ''}`}>
+      <div
+        key={current}
+        className={`ls-content${hasImage ? ' ls-content-left' : ''}`}
+        data-edit={`slides.${current}`}
+        data-edit-label={`Slide ${current + 1}`}
+      >
         <span className="ls-label en-only">{slide.label}</span>
         <span className="ls-label ar-only">{slide.labelAr}</span>
         <h2 className="ls-headline en-only" dangerouslySetInnerHTML={{ __html: slide.headline }} />

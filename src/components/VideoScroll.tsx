@@ -22,24 +22,36 @@ interface VideoScrollProps {
   overlays: Overlay[]
   sectionHeight?: string
   maxSeconds?: number
+  editPrefix?: string
+  mediaType?: 'video' | 'image'
+  image?: string
+  bg?: 'light' | 'dark'
+  fit?: 'screen' | 'natural'
+  textPos?: 'center' | 'left' | 'top-left'
 }
 
-export default function VideoScroll({ src, overlays, sectionHeight = '400vh', maxSeconds }: VideoScrollProps) {
+export default function VideoScroll({ src, overlays, sectionHeight = '400vh', maxSeconds, editPrefix, mediaType, image, bg, fit, textPos }: VideoScrollProps) {
+  const isImage = mediaType === 'image' && !!image
+  const isLight = isImage && bg === 'light'
+  const isNatural = isImage && fit === 'natural'
+  const posClass = isImage && textPos && textPos !== 'center' ? ` txt-${textPos}` : ''
   const sectionRef  = useRef<HTMLDivElement>(null)
   const videoRef    = useRef<HTMLVideoElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const video   = videoRef.current
     const section = sectionRef.current
-    if (!video || !section) return
+    if (!section) return
 
-    video.pause()
-    video.currentTime = 0
+    const video = videoRef.current
+    if (video) {
+      video.pause()
+      video.currentTime = 0
+    }
 
-    const keepPaused = () => setTimeout(() => video.pause(), 50)
-    video.addEventListener('play', keepPaused)
+    const keepPaused = () => setTimeout(() => video?.pause(), 50)
+    video?.addEventListener('play', keepPaused)
 
     let ticking = false
     const handleScroll = () => {
@@ -52,7 +64,7 @@ export default function VideoScroll({ src, overlays, sectionHeight = '400vh', ma
         const p        = Math.max(0, Math.min(1, scrolled / total))
 
         if (progressRef.current) progressRef.current.style.width = `${p * 100}%`
-        if (video.duration && !isNaN(video.duration)) {
+        if (video && video.duration && !isNaN(video.duration)) {
           const span = maxSeconds ? Math.min(maxSeconds, video.duration) : video.duration
           const target = p * span
           if (Math.abs(video.currentTime - target) > 0.08) video.currentTime = target
@@ -65,37 +77,54 @@ export default function VideoScroll({ src, overlays, sectionHeight = '400vh', ma
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      video.removeEventListener('play', keepPaused)
+      video?.removeEventListener('play', keepPaused)
     }
-  }, [maxSeconds])
+  }, [maxSeconds, isImage])
 
   const PAD = 0.06
   function cls(o: Overlay) {
+    // Static image: text + CTA are always visible, independent of scroll.
+    if (isImage) return 'vid-text visible'
     if (progress > o.startPct + PAD && progress < o.endPct - PAD) return 'vid-text visible'
     if (progress >= o.endPct - PAD) return 'vid-text exit'
     return 'vid-text'
   }
 
   return (
-    <div ref={sectionRef} className="scroll-section" style={{ height: sectionHeight }}>
+    <div
+      ref={sectionRef}
+      className={`scroll-section${isLight ? ' vid-light' : ''}${isNatural ? ' banner-natural' : ''}${posClass}`}
+      style={{ height: isNatural ? 'auto' : sectionHeight }}
+    >
       <div className="video-sticky">
-        <video
-          ref={videoRef}
-          src={src}
-          className="hero-vid"
-          muted
-          playsInline
-          preload="auto"
-        />
+        {isImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="" className="hero-vid" style={isNatural ? undefined : { objectFit: isLight ? 'contain' : 'cover' }} />
+        ) : (
+          <video
+            ref={videoRef}
+            src={src}
+            className="hero-vid"
+            muted
+            playsInline
+            preload="auto"
+          />
+        )}
 
         <div className="vid-overlay-group">
-          {overlays.map(o => {
+          {overlays.map((o, i) => {
             const hasBothHeadlines = !!o.headlineHtmlAr
             const hasBothEyebrows  = !!o.eyebrowAr
             const hasBothSublines  = !!(o.sublineEn && o.sublineAr)
 
             return (
-              <div key={o.id} className={cls(o)} style={o.position}>
+              <div
+                key={o.id}
+                className={cls(o)}
+                style={o.position}
+                data-edit={editPrefix ? `${editPrefix}.overlays.${i}` : undefined}
+                data-edit-label={`Text overlay ${i + 1}`}
+              >
 
                 {/* Eyebrow */}
                 {o.eyebrow && (

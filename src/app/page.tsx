@@ -5,13 +5,41 @@ import NewsletterForm from '@/components/NewsletterForm'
 import CategoryGrid from '@/components/CategoryGrid'
 import LuxurySlider from '@/components/LuxurySlider'
 import { getProductsByCollection } from '@/lib/sanity'
+import { getSiteContent, type VideoBlock, type MarqueeItem } from '@/lib/site-content'
 
 export const revalidate = 3600
 
+// Drop CTAs with no label so empty buttons never render.
+function clean(block: VideoBlock): VideoBlock {
+  return {
+    ...block,
+    overlays: block.overlays.map(o =>
+      o.cta && !o.cta.label ? { ...o, cta: undefined } : o
+    ),
+  }
+}
+
+function Marquee({ items, reverse, editPath }: { items: MarqueeItem[]; reverse?: boolean; editPath?: string }) {
+  return (
+    <div className="marquee" data-edit={editPath} data-edit-label="Scrolling bar">
+      <div className={`marquee-track${reverse ? ' rev' : ''}`}>
+        {[...items, ...items].map((item, i) => (
+          <span key={i}>
+            <span className="m-item en-only">{item.en}</span>
+            <span className="m-item ar-only">{item.ar}</span>
+            <span className="m-dot"> ✦ </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default async function HomePage() {
-  const [lipProducts, eyeProducts] = await Promise.all([
+  const [lipProducts, eyeProducts, content] = await Promise.all([
     getProductsByCollection('lip'),
     getProductsByCollection('eye'),
+    getSiteContent(),
   ])
 
   return (
@@ -19,18 +47,16 @@ export default async function HomePage() {
 
       {/* ══════════════════ VIDEO 1 — HERO ══════════════════ */}
       <VideoScroll
-        src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/1.mp4"
-        sectionHeight="500vh"
-        maxSeconds={1}
-        overlays={[
-          {
-            id: 't1a',
-            startPct: 0.05, endPct: 0.95,
-            headlineHtml: '<img src="/logo.png" alt="Claraline" style="height:56px;width:auto;display:block;margin:0 auto 12px;object-fit:contain" /><em>Unveiled</em>',
-            headlineHtmlAr: '<img src="/logo.png" alt="Claraline" style="height:56px;width:auto;display:block;margin:0 auto 12px;object-fit:contain" /><em>كُشف عنها</em>',
-            cta: { label: 'Shop Now', labelAr: 'تسوقي الآن', href: '/shop' },
-          },
-        ]}
+        src={content.hero.src}
+        sectionHeight={content.hero.sectionHeight ?? '500vh'}
+        maxSeconds={content.hero.maxSeconds}
+        overlays={clean(content.hero).overlays}
+        mediaType={content.hero.mediaType}
+        image={content.hero.image}
+        bg={content.hero.bg}
+        fit={content.hero.fit}
+        textPos={content.hero.textPos}
+        editPrefix="hero"
       />
 
       {/* ══════════════════ LIP CAROUSEL ══════════════════ */}
@@ -41,100 +67,56 @@ export default async function HomePage() {
       </div>
 
       {/* ══════════════════ PRODUCT CATEGORIES ══════════════════ */}
-      <CategoryGrid />
+      <CategoryGrid
+        categories={content.categories}
+        labelEn={content.categoryLabelEn}
+        labelAr={content.categoryLabelAr}
+        titleEn={content.categoryTitleEn}
+        titleAr={content.categoryTitleAr}
+      />
 
       {/* ══════════════════ FULL-SCREEN LUXURY SLIDER ══════════════════ */}
-      <LuxurySlider />
+      <LuxurySlider slides={content.slides} />
 
       {/* ══════════════════ VIDEOS 2 + 5 — SIDE BY SIDE ══════════════════ */}
       <div className="video-row-pair">
         <div className="video-row-half">
           <VideoScroll
-            src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/2.mp4"
-            maxSeconds={0.5}
-            overlays={[
-              {
-                id: 't2a',
-                startPct: 0.1, endPct: 0.5,
-                eyebrow: 'The Ritual Begins',
-                eyebrowAr: 'يبدأ الطقس',
-                headlineHtml: 'Colors in<br/><em>motion</em>',
-                headlineHtmlAr: 'الألوان في<br/><em>حركة</em>',
-                sublineEn: 'Colors dancing in beauty',
-                sublineAr: 'الألوان تتراقص في سماء الجمال',
-              },
-              {
-                id: 't2b',
-                startPct: 0.6, endPct: 1.0,
-                headlineHtml: 'Every shade<br/>tells a <em>story</em>',
-                headlineHtmlAr: 'كل لون<br/>يحكي <em>قصة</em>',
-                headlineFontSize: '44px',
-              },
-            ]}
+            src={content.sideLeft.src}
+            sectionHeight={content.sideLeft.sectionHeight}
+            maxSeconds={content.sideLeft.maxSeconds}
+            overlays={clean(content.sideLeft).overlays}
+            mediaType={content.sideLeft.mediaType}
+            image={content.sideLeft.image}
+            bg={content.sideLeft.bg}
+            fit={content.sideLeft.fit}
+            textPos={content.sideLeft.textPos}
+            editPrefix="sideLeft"
           />
         </div>
         <div className="video-row-half">
           <VideoScroll
-            src="https://levfmhhdskkimeqyxawb.supabase.co/storage/v1/object/public/videos/5.mp4"
-            maxSeconds={0.5}
-            overlays={[
-              {
-                id: 't5a',
-                startPct: 0.15, endPct: 0.85,
-                eyebrow: 'Abundance',
-                eyebrowAr: 'الوفرة',
-                headlineHtml: 'Every drop<br/><em>matters</em>',
-                headlineHtmlAr: 'كل قطرة<br/><em>تصنع الفارق</em>',
-                sublineEn: 'Every drop makes a difference',
-                sublineAr: 'كل قطرة تصنع الفارق',
-              },
-            ]}
+            src={content.sideRight.src}
+            sectionHeight={content.sideRight.sectionHeight}
+            maxSeconds={content.sideRight.maxSeconds}
+            overlays={clean(content.sideRight).overlays}
+            mediaType={content.sideRight.mediaType}
+            image={content.sideRight.image}
+            bg={content.sideRight.bg}
+            fit={content.sideRight.fit}
+            textPos={content.sideRight.textPos}
+            editPrefix="sideRight"
           />
         </div>
       </div>
 
       {/* ══════════════════ MARQUEE + STATS ══════════════════ */}
       <div className="fixed-section">
-        <div className="marquee">
-          <div className="marquee-track">
-            {[
-              { en: 'Luxury Makeup',  ar: 'ميك أب فاخر',      dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'Kuwait City',    ar: 'مدينة الكويت',       dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'Cruelty Free',   ar: 'خالٍ من القسوة',    dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'GCC Delivery',   ar: 'توصيل للخليج',       dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'Luxury Makeup',  ar: 'ميك أب فاخر',        dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'Kuwait City',    ar: 'مدينة الكويت',        dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-              { en: 'Cruelty Free',   ar: 'خالٍ من القسوة',     dot: false },
-              { en: '✦',             ar: '✦',                   dot: true  },
-              { en: 'GCC Delivery',   ar: 'توصيل للخليج',        dot: false },
-              { en: '✦',              ar: '✦',                  dot: true  },
-            ].map((item, i) =>
-              item.dot
-                ? <span key={i} className="m-dot"> ✦ </span>
-                : (
-                  <span key={i}>
-                    <span className="m-item en-only">{item.en}</span>
-                    <span className="m-item ar-only">{item.ar}</span>
-                  </span>
-                )
-            )}
-          </div>
-        </div>
+        <Marquee items={content.marqueeTop} editPath="marqueeTop" />
 
         <div className="stats-strip reveal-target">
-          {[
-            { num: '12K+', en: 'Happy Clients',   ar: 'عميلة سعيدة'    },
-            { num: '48',   en: 'Unique Shades',    ar: 'لون فريد'        },
-            { num: '6',    en: 'GCC Countries',    ar: 'دولة خليجية'    },
-            { num: '100%', en: 'Cruelty Free',     ar: 'خالي من القسوة' },
-          ].map(s => (
-            <div key={s.num} className="stat-item">
+          {content.stats.map((s, i) => (
+            <div key={s.num + s.en} className="stat-item" data-edit={`stats.${i}`} data-edit-label={`Stat ${i + 1}`}>
               <div className="stat-num">{s.num}</div>
               <div className="stat-label en-only">{s.en}</div>
               <div className="stat-ar ar-only">{s.ar}</div>
@@ -150,22 +132,15 @@ export default async function HomePage() {
         <div className="sep"></div>
         <div className="story-strip reveal-target" id="features">
           <div className="story-cols">
-            <div className="story-col-left">
-              <span className="sc-label en-only">Why Claraline</span>
-              <span className="sc-label ar-only">لماذا كالرالاين</span>
-              <h2 className="sc-title en-only">Crafted<br/>for <em>you</em></h2>
-              <h2 className="sc-title ar-only">مُصنَّع<br/>من <em>أجلكِ</em></h2>
+            <div className="story-col-left" data-edit="features" data-edit-label="Features heading">
+              <span className="sc-label en-only">{content.features.labelEn}</span>
+              <span className="sc-label ar-only">{content.features.labelAr}</span>
+              <h2 className="sc-title en-only" dangerouslySetInnerHTML={{ __html: content.features.titleEn }} />
+              <h2 className="sc-title ar-only" dangerouslySetInnerHTML={{ __html: content.features.titleAr }} />
             </div>
             <div className="story-col-right reveal-target">
-              {[
-                { icon: '✦', en: 'Halal Certified',  ar: 'معتمد حلال',     bodyEn: 'All our products are officially halal certified',         bodyAr: 'جميع منتجاتنا حلال ومعتمدة رسمياً' },
-                { icon: '◈', en: 'Long Lasting',      ar: 'يدوم طويلاً',    bodyEn: 'Stays all day in the hot Gulf climate',                   bodyAr: 'تدوم طوال اليوم في أجواء الخليج الحارة' },
-                { icon: '◇', en: 'Gulf Climate',      ar: 'مناخ الخليج',    bodyEn: 'Specially formulated for Gulf climate conditions',         bodyAr: 'مُصمَّم خصيصاً لمناخ دول الخليج' },
-                { icon: '✧', en: 'Cruelty Free',      ar: 'خالٍ من القسوة', bodyEn: 'Never tested on animals — always and forever',            bodyAr: 'لا اختبارات على الحيوانات أبداً' },
-                { icon: '◉', en: 'Rich Pigment',      ar: 'تغطية غنية',     bodyEn: 'Full coverage formula with vibrant colors',               bodyAr: 'تركيبة بتغطية كاملة وألوان نابضة' },
-                { icon: '⟡', en: 'Kuwait Made',       ar: 'صُنع في الكويت', bodyEn: 'Proudly crafted in the heart of Kuwait',                  bodyAr: 'مصنوع بفخر في قلب الكويت' },
-              ].map(f => (
-                <div key={f.en} className="feature-card">
+              {content.features.cards.map((f, i) => (
+                <div key={f.en} className="feature-card" data-edit={`features.cards.${i}`} data-edit-label={`Feature ${i + 1}`}>
                   <span className="fc-icon">{f.icon}</span>
                   <div className="fc-title en-only">{f.en}</div>
                   <div className="fc-title ar-only">{f.ar}</div>
@@ -189,33 +164,17 @@ export default async function HomePage() {
       {/* ══════════════════ TESTIMONIALS ══════════════════ */}
       <div className="fixed-section">
         <div className="testimonials reveal-target" id="testimonials">
-          <div className="test-header">
-            <span className="t-label en-only">Real Reviews</span>
-            <span className="t-label ar-only">آراء حقيقية</span>
+          <div className="test-header" data-edit="testimonials" data-edit-label="Testimonials heading">
+            <span className="t-label en-only">{content.testimonials.labelEn}</span>
+            <span className="t-label ar-only">{content.testimonials.labelAr}</span>
             <h2 className="t-title">
-              <span className="en-only">They <em>love</em> Claraline</span>
-              <span className="ar-only">يحبّون <em>كالرالاين</em></span>
+              <span className="en-only" dangerouslySetInnerHTML={{ __html: content.testimonials.titleEn }} />
+              <span className="ar-only" dangerouslySetInnerHTML={{ __html: content.testimonials.titleAr }} />
             </h2>
           </div>
           <div className="test-grid">
-            {[
-              {
-                en:  '"The Velvet Rouge stays on all day — even in Kuwait summer."',
-                ar:  '«يدوم طوال اليوم حتى في صيف الكويت الحار، لا مثيل له»',
-                initials: 'نو', name: 'Noura Al-Rashidi', loc: 'Kuwait City',
-              },
-              {
-                en:  '"Desert Dusk is the palette I never knew I needed."',
-                ar:  '«باليت غروب الصحراء كان الناقص في حياتي، ألوان ساحرة»',
-                initials: 'سا', name: 'Sara Al-Mutairi', loc: 'Salmiya, Kuwait',
-              },
-              {
-                en:  '"Finally a luxury brand that understands Gulf skin tones."',
-                ar:  '«أول علامة فاخرة تفهم درجات بشرة الخليج فعلاً»',
-                initials: 'لي', name: 'Lina Al-Ahmad', loc: 'Hawalli, Kuwait',
-              },
-            ].map(t => (
-              <div key={t.name} className="test-card">
+            {content.testimonials.items.map((t, i) => (
+              <div key={t.name} className="test-card" data-edit={`testimonials.items.${i}`} data-edit-label={`Review ${i + 1}`}>
                 <p className="test-quote en-only">&ldquo;{t.en.replace(/^"|"$/g, '')}&rdquo;</p>
                 <p className="test-quote-ar ar-only">{t.ar}</p>
                 <div className="test-author">
@@ -236,58 +195,30 @@ export default async function HomePage() {
       <div className="fixed-section">
         <div className="sep"></div>
 
-        <div className="newsletter">
-          <span className="nl-label en-only">Join the Ritual</span>
-          <span className="nl-label ar-only">انضمي إلى الطقس</span>
+        <div className="newsletter" data-edit="newsletter" data-edit-label="Newsletter">
+          <span className="nl-label en-only">{content.newsletter.labelEn}</span>
+          <span className="nl-label ar-only">{content.newsletter.labelAr}</span>
           <h2 className="nl-title">
-            <span className="en-only">Be the <em>first</em></span>
-            <span className="ar-only">كوني <em>الأولى</em></span>
+            <span className="en-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleEn }} />
+            <span className="ar-only" dangerouslySetInnerHTML={{ __html: content.newsletter.titleAr }} />
           </h2>
-          <p className="nl-sub en-only" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Get exclusive offers and be the first to discover new arrivals</p>
-          <p className="nl-sub ar-only">احصلي على العروض الحصرية وأحدث الإضافات</p>
+          <p className="nl-sub en-only" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{content.newsletter.subEn}</p>
+          <p className="nl-sub ar-only">{content.newsletter.subAr}</p>
           <NewsletterForm />
         </div>
 
         {/* Marquee 2 */}
-        <div className="marquee">
-          <div className="marquee-track rev">
-            {[
-              { en: 'KNET Accepted',             ar: 'KNET مقبول',          dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'Tabby — Buy Now Pay Later',  ar: 'تابي — اشتري الآن',  dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'Free Delivery Over KWD 20',  ar: 'توصيل مجاني فوق 20 د', dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'Tamara Available',           ar: 'تمارا متوفرة',         dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'GCC Shipping',               ar: 'شحن للخليج',           dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'KNET Accepted',             ar: 'KNET مقبول',            dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-              { en: 'Tabby — Buy Now Pay Later',  ar: 'تابي — اشتري الآن',  dot: false },
-              { en: '✦',                         ar: '✦',                    dot: true  },
-            ].map((item, i) =>
-              item.dot
-                ? <span key={i} className="m-dot"> ✦ </span>
-                : (
-                  <span key={i}>
-                    <span className="m-item en-only">{item.en}</span>
-                    <span className="m-item ar-only">{item.ar}</span>
-                  </span>
-                )
-            )}
-          </div>
-        </div>
+        <Marquee items={content.marqueeBottom} reverse editPath="marqueeBottom" />
 
         {/* Footer */}
-        <footer>
+        <footer data-edit="footer" data-edit-label="Footer">
           <div className="footer-grid">
             <div>
               <div className="footer-logo">
                 <span className="claraline-logo" style={{ width: '180px', height: '44px' }} aria-label="Claraline" />
               </div>
-              <p className="footer-tag en-only" style={{ fontFamily: "'Cormorant Garamond', serif", direction: 'ltr' }}>Beauty from Kuwait to the world</p>
-              <p className="footer-tag ar-only">جمالٌ من الكويت إلى العالم</p>
+              <p className="footer-tag en-only" style={{ fontFamily: "'Cormorant Garamond', serif", direction: 'ltr' }}>{content.footer.tagEn}</p>
+              <p className="footer-tag ar-only">{content.footer.tagAr}</p>
               <div className="footer-socials">
                 {['ig', 'tt', 'wa', 'sc'].map(s => (
                   <div key={s} className="footer-social">{s}</div>
@@ -295,55 +226,43 @@ export default async function HomePage() {
               </div>
             </div>
             <div>
-              <div className="footer-col-title en-only">Shop</div>
-              <div className="footer-col-title ar-only">تسوقي</div>
+              <div className="footer-col-title en-only">{content.footer.shopTitleEn}</div>
+              <div className="footer-col-title ar-only">{content.footer.shopTitleAr}</div>
               <ul className="footer-links en-only">
-                {['Lip Collection', 'Eye Collection', 'Foundation', 'Gift Sets', 'New Arrivals'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.shopLinks.map(l => <li key={l.en}>{l.en}</li>)}
               </ul>
               <ul className="footer-links ar-only">
-                {['مجموعة الشفاه', 'مجموعة العيون', 'الأساس', 'طقم الهدايا', 'وصل حديثاً'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.shopLinks.map(l => <li key={l.ar}>{l.ar}</li>)}
               </ul>
             </div>
             <div>
-              <div className="footer-col-title en-only">Contact</div>
-              <div className="footer-col-title ar-only">تواصل معنا</div>
+              <div className="footer-col-title en-only">{content.footer.contactTitleEn}</div>
+              <div className="footer-col-title ar-only">{content.footer.contactTitleAr}</div>
               <ul className="footer-links en-only">
-                {['Instagram', 'WhatsApp', 'Email Us', 'Kuwait — Shuwaikh', 'Return Policy'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.contactLinks.map(l => <li key={l.en}>{l.en}</li>)}
               </ul>
               <ul className="footer-links ar-only">
-                {['إنستغرام', 'واتساب', 'البريد الإلكتروني', 'الكويت — الشويخ', 'سياسة الإرجاع'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.contactLinks.map(l => <li key={l.ar}>{l.ar}</li>)}
               </ul>
             </div>
             <div>
-              <div className="footer-col-title en-only">Info</div>
-              <div className="footer-col-title ar-only">معلومات</div>
+              <div className="footer-col-title en-only">{content.footer.infoTitleEn}</div>
+              <div className="footer-col-title ar-only">{content.footer.infoTitleAr}</div>
               <ul className="footer-links en-only">
-                {['About Us', 'Ingredients', 'Sustainability', 'Halal Certificate'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.infoLinks.map(l => <li key={l.en}>{l.en}</li>)}
                 <li><Link href="/privacy">Privacy Policy</Link></li>
                 <li><Link href="/terms">Terms &amp; Conditions</Link></li>
               </ul>
               <ul className="footer-links ar-only">
-                {['من نحن', 'المكونات', 'الاستدامة', 'شهادة حلال'].map(l => (
-                  <li key={l}>{l}</li>
-                ))}
+                {content.footer.infoLinks.map(l => <li key={l.ar}>{l.ar}</li>)}
                 <li><Link href="/privacy">سياسة الخصوصية</Link></li>
                 <li><Link href="/terms">الشروط والأحكام</Link></li>
               </ul>
             </div>
           </div>
           <div className="footer-bottom">
-            <span className="footer-copy en-only">© 2025 Claraline Kuwait. All rights reserved.</span>
-            <span className="footer-copy ar-only">© 2025 كالرالاين الكويت. جميع الحقوق محفوظة.</span>
+            <span className="footer-copy en-only">{content.footer.copyrightEn}</span>
+            <span className="footer-copy ar-only">{content.footer.copyrightAr}</span>
             <span className="footer-copy en-only" style={{ display: 'flex', gap: '16px' }}>
               <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>Privacy</Link>
               <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}>Terms</Link>

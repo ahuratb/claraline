@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "import": "npx tsx scripts/import-products.ts",
-    "attach-images": "npx tsx scripts/attach-images.ts"
+    "attach-images": "npx tsx scripts/attach-images.ts",
+    "make-admin": "npx tsx scripts/make-admin.ts",
+    "update-banners": "npx tsx scripts/update-side-banners.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^1.0.0",

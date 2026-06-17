@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function ThemeToggle({ size = 36, iconSize = 18 }: Props) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
     setTheme(document.documentElement.classList.contains('theme-light') ? 'light' : 'dark')

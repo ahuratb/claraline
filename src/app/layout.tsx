@@ -9,6 +9,7 @@ import Cursor from '@/components/Cursor'
 import LoadingScreen from '@/components/LoadingScreen'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import SessionProvider from '@/components/SessionProvider'
+import PreviewBridge from '@/components/PreviewBridge'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
@@ -32,8 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){
               try {
                 var t = localStorage.getItem('claraline-theme');
-                if (t === 'light') document.documentElement.classList.add('theme-light');
-              } catch(e) {}
+                // Default theme is light (white + beige). Only explicit 'dark' opts out.
+                if (t !== 'dark') document.documentElement.classList.add('theme-light');
+              } catch(e) { document.documentElement.classList.add('theme-light'); }
             })()`
           }}
         />
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning>
         <SessionProvider>
+        <PreviewBridge />
         <LoadingScreen />
         <Cursor />
 

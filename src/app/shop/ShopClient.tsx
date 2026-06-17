@@ -52,6 +52,12 @@ export default function ShopClient({ products }: { products: Product[] }) {
     return Math.ceil(m / 10) * 10
   }, [products])
 
+  // Slider starts at the cheapest product (rounded down), not 0.
+  const priceMin = useMemo(() => {
+    if (!products.length) return 0
+    return Math.floor(Math.min(...products.map(p => p.price)))
+  }, [products])
+
   const [filters, setFilters] = useState<Filters>({
     collection: 'all', badges: [], maxPrice: priceMax, shadesOnly: false, inStockOnly: false,
   })
@@ -232,7 +238,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
         </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
           <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'Cairo, sans-serif', letterSpacing: '0.1em' }}>
-            KWD 0.000
+            {formatPrice(priceMin)}
           </span>
           <span style={{
             fontSize:    '10px',
@@ -251,13 +257,13 @@ export default function ShopClient({ products }: { products: Product[] }) {
           }} />
           <div style={{
             position: 'absolute', left: 0,
-            width: `${(filters.maxPrice / priceMax) * 100}%`,
+            width: `${priceMax > priceMin ? ((filters.maxPrice - priceMin) / (priceMax - priceMin)) * 100 : 100}%`,
             height: '1px', background: 'var(--champagne)',
             transition: 'width 0.15s ease',
           }} />
           <input
             type="range"
-            min={0}
+            min={priceMin}
             max={priceMax}
             step={1}
             value={filters.maxPrice}

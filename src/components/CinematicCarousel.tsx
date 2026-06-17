@@ -360,7 +360,7 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
 
   return (
     <div className="carousel-section">
-      {/* Header */}
+      {/* Header — text only, top-left aligned with the items */}
       <div className="carousel-header reveal-target">
         <div>
           <div className="section-label en-only">{labelEn}</div>
@@ -370,19 +370,16 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
           <p className="section-body-ar en-only" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{descEn}</p>
           <p className="section-body-ar ar-only">{descAr}</p>
         </div>
-        {/* Arrows — desktop only */}
-        <div className="carousel-nav carousel-nav-desktop">
-          <button className="carousel-arrow" onClick={() => slide(-1)}>
-            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <button className="carousel-arrow" onClick={() => slide(1)}>
-            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
       </div>
 
-      {/* Desktop / tablet horizontal carousel */}
+      {/* Desktop / tablet horizontal carousel — arrows flank the items */}
       <div className="carousel-desktop">
+        <button className="carousel-arrow carousel-side prev" onClick={() => slide(-1)} aria-label="Previous">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button className="carousel-arrow carousel-side next" onClick={() => slide(1)} aria-label="Next">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
         <div
           className="carousel-track-wrap"
           onTouchStart={onTouchStart}
