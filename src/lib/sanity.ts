@@ -32,7 +32,7 @@ async function safeFetch<T>(query: string, params?: Record<string, unknown>, fal
 
 export function getFeaturedProducts(): Promise<Product[]> {
   return safeFetch<Product>(`
-    *[_type == "product" && featured == true && inStock == true] | order(_createdAt desc) {
+    *[_type == "product" && featured == true && inStock != false] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, description_ar
     }
   `)
@@ -40,7 +40,7 @@ export function getFeaturedProducts(): Promise<Product[]> {
 
 export function getProductsByCollection(collection: string): Promise<Product[]> {
   return safeFetch<Product>(
-    `*[_type == "product" && collection == $collection && inStock == true] | order(_createdAt desc) {
+    `*[_type == "product" && collection == $collection && inStock != false] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, shades
     }`,
     { collection }
@@ -49,7 +49,7 @@ export function getProductsByCollection(collection: string): Promise<Product[]> 
 
 export function getAllProducts(): Promise<Product[]> {
   return safeFetch<Product>(`
-    *[_type == "product" && inStock == true] | order(_createdAt desc) {
+    *[_type == "product" && inStock != false] | order(_createdAt desc) {
       _id, name_en, name_ar, slug, price, images, collection, badge, featured
     }
   `)
