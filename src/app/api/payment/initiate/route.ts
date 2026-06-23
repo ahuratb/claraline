@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (!charge?.transaction?.url) {
+      console.error('[payment/initiate] Tap response:', JSON.stringify(charge))
       return NextResponse.json({ error: charge?.message ?? 'Payment initiation failed' }, { status: 400 })
     }
 

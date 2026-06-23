@@ -1,8 +1,10 @@
 const BASE_URL = 'https://api.tap.company/v2'
 
-const headers = {
-  Authorization: `Bearer ${process.env.TAP_SECRET_KEY}`,
-  'Content-Type': 'application/json',
+function getHeaders() {
+  return {
+    Authorization: `Bearer ${process.env.TAP_SECRET_KEY}`,
+    'Content-Type': 'application/json',
+  }
 }
 
 function parsePhone(phone: string) {
@@ -28,7 +30,7 @@ export async function createCharge(params: {
 
   const res = await fetch(`${BASE_URL}/charges`, {
     method: 'POST',
-    headers,
+    headers: getHeaders(),
     body: JSON.stringify({
       amount: params.amount,
       currency: 'KWD',
@@ -54,6 +56,6 @@ export async function createCharge(params: {
 }
 
 export async function getCharge(chargeId: string) {
-  const res = await fetch(`${BASE_URL}/charges/${chargeId}`, { headers })
+  const res = await fetch(`${BASE_URL}/charges/${chargeId}`, { headers: getHeaders() })
   return res.json()
 }
