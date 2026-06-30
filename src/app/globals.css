@@ -1,24 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --obsidian: #0a0806;
-  --champagne: #C9A96E;
-  --ivory: #FAF5EE;
-  --muted: #9a8a7a;
-  --rose: #C4827A;
-  --deep: #1a1208;
-}
-
-/* ═══════════════════════════════════════════════════
-   LIGHT THEME — toggled via `html.theme-light`
-═══════════════════════════════════════════════════ */
-html.theme-light {
-  --obsidian: #FAF5EE;   /* page background → warm cream */
-  --ivory:    #1F1812;   /* text → deep coffee */
-  --champagne:#8E6A36;   /* accent → deeper gold for contrast */
-  --muted:    #7A6755;   /* secondary text → warm taupe */
-  --rose:     #A55C66;   /* secondary accent → deeper rose */
-  --deep:     #F2EAD9;   /* layered surface → soft cream */
+  --obsidian: #FAF5EE;
+  --champagne: #8E6A36;
+  --ivory: #1F1812;
+  --muted: #7A6755;
+  --rose: #A55C66;
+  --deep: #F2EAD9;
 }
 
 /* Cinematic sections stay dark regardless of theme — the

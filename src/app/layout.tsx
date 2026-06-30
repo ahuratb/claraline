@@ -25,20 +25,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="theme-light">
       <head>
-        {/* Restore saved theme before first paint — prevents flash */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){
-              try {
-                var t = localStorage.getItem('claraline-theme');
-                // Default theme is light (white + beige). Only explicit 'dark' opts out.
-                if (t !== 'dark') document.documentElement.classList.add('theme-light');
-              } catch(e) { document.documentElement.classList.add('theme-light'); }
-            })()`
-          }}
-        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />

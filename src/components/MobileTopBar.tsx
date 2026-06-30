@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/store'
 import { MENU_CATEGORIES } from '@/lib/menu-categories'
-import ThemeToggle from './ThemeToggle'
 import KuwaitFlag from './KuwaitFlag'
 import USAFlag from './USAFlag'
 
@@ -108,7 +107,6 @@ export default function MobileTopBar() {
           >
             <span /><span /><span />
           </button>
-          <ThemeToggle size={36} iconSize={16} />
         </div>
 
         <Link href="/" className="mob-topbar-logo" onClick={closeMenu} aria-label="Claraline home">

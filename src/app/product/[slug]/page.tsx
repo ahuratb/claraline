@@ -1,4 +1,4 @@
-import { getProductBySlug, getAllProductSlugs, getProductsByCollection, urlFor } from '@/lib/sanity'
+import { getProductBySlug, getAllProductSlugs, getProductsByCollection } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -139,11 +139,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const labels = COLLECTION_LABEL[product.collection] ?? { en: 'Collection', ar: 'المجموعة' }
   const spotlight = SPOTLIGHT[product.collection] ?? SPOTLIGHT.lip
   const howto = HOWTO[product.collection] ?? HOWTO.lip
-  const momentImageUrl = product.images?.[1]
-    ? urlFor(product.images[1]).width(1920).height(1080).url()
-    : product.images?.[0]
-      ? urlFor(product.images[0]).width(1920).height(1080).url()
-      : null
+  const momentImageUrl = product.images?.[1] ?? product.images?.[0] ?? null
 
   const ingredientCopy = spotlight.map(s => ({ en: s.name, ar: s.body }))
 
@@ -281,7 +277,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
           <div className="pdp-pair-grid">
             {related.map(p => {
-              const img = p.images?.[0] ? urlFor(p.images[0]).width(480).height(640).url() : null
+              const img = p.images?.[0] ?? null
               return (
                 <Link href={`/product/${p.slug.current}`} className="pdp-pair-card" key={p._id}>
                   <div className="pdp-pair-card-img">

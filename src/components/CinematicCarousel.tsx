@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { Product } from '@/types'
-import { urlFor } from '@/lib/sanity'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
 
@@ -240,7 +239,7 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
   function handleProductAdd(e: React.MouseEvent, p: Product) {
     e.preventDefault()
     e.stopPropagation()
-    const image = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : undefined
+    const image = p.images?.[0] ?? undefined
     addItem({
       productId: p._id,
       name_en:   p.name_en,
@@ -300,7 +299,7 @@ function Carousel({ id, labelEn, labelAr, titleEn, titleAr, descEn, descAr, card
   /* ── Card renderers (shared between carousel + mobile grid) ── */
 
   function renderRealCard(p: Product) {
-    const img = p.images?.[0] ? urlFor(p.images[0]).width(640).height(854).url() : null
+    const img = p.images?.[0] ?? null
     const badge = p.badge ? BADGE_LABEL[p.badge] : null
     const bg = COLLECTION_BG[p.collection] ?? 'c1'
     return (

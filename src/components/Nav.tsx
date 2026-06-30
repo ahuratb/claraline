@@ -7,12 +7,9 @@ import MegaMenu from '@/components/MegaMenu'
 import KuwaitFlag from '@/components/KuwaitFlag'
 import UKFlag from '@/components/UKFlag'
 
-type Theme = 'dark' | 'light'
-
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [lang, setLang] = useState<'EN' | 'AR'>('EN')
-  const [theme, setTheme] = useState<Theme>('light')
   const [megaOpen, setMegaOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const [navHeight, setNavHeight] = useState(0)
@@ -26,10 +23,6 @@ export default function Nav() {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    setTheme(document.documentElement.classList.contains('theme-light') ? 'light' : 'dark')
   }, [])
 
   // Track the rendered nav height so the mega menu sits directly under it
@@ -52,13 +45,6 @@ export default function Nav() {
     document.body.dir = next === 'AR' ? 'rtl' : 'ltr'
   }
 
-  const toggleTheme = () => {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    document.documentElement.classList.toggle('theme-light', next === 'light')
-    try { localStorage.setItem('claraline-theme', next) } catch {}
-  }
-
   const cancelClose = () => { if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null } }
   const scheduleClose = () => {
     cancelClose()
@@ -67,10 +53,7 @@ export default function Nav() {
   const openMega = () => { cancelClose(); setMegaOpen(true) }
   const toggleMega = () => { cancelClose(); setMegaOpen(o => !o) }
 
-  // In light mode before first scroll the nav is transparent over the dark hero
-  // video — force dark-mode palette so text stays readable, then revert once
-  // the blurred backdrop kicks in on scroll.
-  const forceLight = theme === 'light' && !scrolled
+  const forceLight = !scrolled
 
   return (
     <>
@@ -158,24 +141,6 @@ export default function Nav() {
           className="flex items-center gap-5"
           style={{ animation: 'fadeUp 1s 0.6s forwards', opacity: 0 }}
         >
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="w-[40px] h-[40px] border border-[rgba(201,169,110,0.3)] flex items-center justify-center hover:border-[var(--champagne)] hover:bg-[rgba(201,169,110,0.08)] transition-all duration-300"
-            style={{ color: 'var(--champagne)' }}
-          >
-            {theme === 'dark' ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            )}
-          </button>
-
           <button
             onClick={toggleLang}
             className="nav-lang-pill"

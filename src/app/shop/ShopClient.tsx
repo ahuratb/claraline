@@ -58,6 +58,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
     return Math.floor(Math.min(...products.map(p => p.price)))
   }, [products])
 
+  const PAGE_SIZE = 9
+
   const [filters, setFilters] = useState<Filters>({
     collection: 'all', badges: [], maxPrice: priceMax, shadesOnly: false, inStockOnly: false,
   })
@@ -66,6 +68,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [gridKey,    setGridKey]    = useState(0)
   const [isAr,       setIsAr]       = useState(false)
+  const [page,       setPage]       = useState(1)
   const prevKey = useRef('')
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
   const discreteKey = `${filters.collection}|${filters.badges.join(',')}|${sort}|${search.trim()}|${filters.shadesOnly}|${filters.inStockOnly}`
   useEffect(() => {
-    if (prevKey.current && prevKey.current !== discreteKey) setGridKey(k => k + 1)
+    if (prevKey.current && prevKey.current !== discreteKey) { setGridKey(k => k + 1); setPage(1) }
     prevKey.current = discreteKey
   }, [discreteKey])
 
@@ -112,6 +115,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
       default:           return [...list].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
     }
   }, [products, filters, sort, search])
+
+  const totalPages = Math.ceil(displayed.length / PAGE_SIZE)
+  const paged = displayed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const activeCount =
     (filters.collection !== 'all' ? 1 : 0) +
@@ -641,11 +647,84 @@ export default function ShopClient({ products }: { products: Product[] }) {
               </button>
             </div>
           ) : (
-            <div key={gridKey} className="shop-grid">
-              {displayed.map((p, i) => (
-                <ProductCard key={p._id} product={p} index={i} />
-              ))}
-            </div>
+            <>
+              <div key={gridKey} className="shop-grid">
+                {paged.map((p, i) => (
+                  <ProductCard key={p._id} product={p} index={i} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div style={{
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  gap:            '8px',
+                  marginTop:      '64px',
+                  paddingTop:     '32px',
+                  borderTop:      '0.5px solid rgba(201,169,110,0.1)',
+                }}>
+                  <button
+                    onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    disabled={page === 1}
+                    style={{
+                      width:      '36px',
+                      height:     '36px',
+                      border:     '0.5px solid rgba(201,169,110,0.25)',
+                      background: 'transparent',
+                      color:      page === 1 ? 'rgba(201,169,110,0.2)' : 'var(--champagne)',
+                      cursor:     page === 1 ? 'default' : 'pointer',
+                      display:    'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                    <button
+                      key={n}
+                      onClick={() => { setPage(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                      style={{
+                        width:         '36px',
+                        height:        '36px',
+                        border:        `0.5px solid ${n === page ? 'var(--champagne)' : 'rgba(201,169,110,0.15)'}`,
+                        background:    n === page ? 'var(--champagne)' : 'transparent',
+                        color:         n === page ? 'var(--obsidian)' : 'var(--muted)',
+                        fontFamily:    'Cairo, sans-serif',
+                        fontSize:      '11px',
+                        letterSpacing: '0.05em',
+                        cursor:        'pointer',
+                        transition:    'all 0.25s',
+                        fontWeight:    n === page ? 600 : 300,
+                      }}
+                    >
+                      {n}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    disabled={page === totalPages}
+                    style={{
+                      width:      '36px',
+                      height:     '36px',
+                      border:     '0.5px solid rgba(201,169,110,0.25)',
+                      background: 'transparent',
+                      color:      page === totalPages ? 'rgba(201,169,110,0.2)' : 'var(--champagne)',
+                      cursor:     page === totalPages ? 'default' : 'pointer',
+                      display:    'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

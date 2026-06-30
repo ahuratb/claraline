@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { Product } from '@/types'
-import { urlFor } from '@/lib/sanity'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
 
@@ -18,7 +17,7 @@ type Tab = 'description' | 'ingredients' | 'howto' | ''
 
 export default function ProductHero({ product, ingredientCopy, howToUseEn, howToUseAr }: Props) {
   const images = product.images?.length ? product.images : []
-  const imageUrls = images.map(img => urlFor(img).width(960).height(1152).url())
+  const imageUrls = images
 
   const [activeImg, setActiveImg] = useState(0)
   const [shade, setShade] = useState(product.shades?.[0]?.name_en ?? '')
@@ -47,7 +46,7 @@ export default function ProductHero({ product, ingredientCopy, howToUseEn, howTo
   const installment = (product.price / 4)
 
   function handleAdd() {
-    const image = product.images?.[0] ? urlFor(product.images[0]).width(400).url() : undefined
+    const image = product.images?.[0] ?? undefined
     for (let i = 0; i < qty; i++) {
       addItem({
         productId: product._id,

@@ -5,10 +5,11 @@ export interface Product {
   name_ar: string
   slug: { current: string }
   price: number
-  images: SanityImage[]
-  collection: 'lip' | 'eye' | 'face' | 'gift'
-  description_en: string
-  description_ar: string
+  compareAtPrice?: number
+  images: string[]
+  collection: string
+  description_en?: string
+  description_ar?: string
   ingredients_en?: string
   ingredients_ar?: string
   howToUse_en?: string
@@ -17,6 +18,7 @@ export interface Product {
   benefits_ar?: string
   sku?: string
   inStock: boolean
+  stockCount?: number
   badge?: 'new' | 'bestseller' | 'limited'
   featured: boolean
   shades?: Shade[]
